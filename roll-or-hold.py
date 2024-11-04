@@ -6,7 +6,7 @@ import random
 import sys
 
 print('Hello, welcome to roll or hold, you will roll a 20 sided die, then will choose if you want to roll again to raise your number, or hold the number. If you can beat my score you win, if you go over 40 you lose.')
-input('ready?')
+input('Type anything to begin.')
 
 score = 0
 while score < 40:
