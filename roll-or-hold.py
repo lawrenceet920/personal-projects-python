@@ -17,7 +17,7 @@ while score < 40:
     elif reroll in ['y', 'yes']:
         score += random.randint(1, 20)
     else:
-        print('OOPS! please either type "y" or "n"')
+        print('OOPS! please either type "y" or "n" \n')
 else:
     sys.exit('You went over 40! Game over!')
 
