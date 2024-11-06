@@ -26,7 +26,7 @@ else:
 
 # already won?
 if score == 40:
-    print('You rolled a 40? You win!')
+    sys.exit('You rolled a 40? You win!')
 
 # AI Rolls
 print(f'Your final score is {score}, My turn!')
