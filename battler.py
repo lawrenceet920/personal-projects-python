@@ -119,14 +119,22 @@ while phase != 'game over':
 
     while phase == 'shop':
         print('Welcome to the shop! \nHere is what you can buy\nOr you can buy nothing and leave \n')
+        print(f'you have {gold} gold')
 
         # Options
-        print('Full heal')
-        print('Nothing')
+        print('Full heal: 100')
+        print(f'Improved boots: {player_stats[0]}')
+        print('Nothing: Free!')
         # Player Input
         buy = input('\n ')
-        if buy == 'full heal':
-            player_stats[3] = player_stats[4]
+        if buy == 'Full heal':
+            if gold > 99:
+                gold -= 100
+                player_stats[3] = player_stats[4]
+        elif buy == 'Improved boots':
+            if gold > {player_stats[0]}:
+                gold -= {player_stats[0]}
+                player_stats[0] += 50
         elif buy == 'Nothing':
             phase = 'combat'
         else:
