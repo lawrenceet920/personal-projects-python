@@ -22,12 +22,19 @@ def new_spell(name, description, min_d, max_d, casts):
     return [name, description, min_d, max_d, casts, casts]
 cantrip = new_spell('Firebolt', 'Your basic relyable attack, low damage', 5, 10, 100)
 heal = new_spell('Cure Wounds', 'heal yourself, medium healing', 50, 100, 3)
-spell3 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
+spell3 = new_spell('Kamehameha', 'high damage and can heal', 0, 0, 1)
 spell4 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
 print('')
 # Unique Spells
 def spell_nothing():
     print('You do nothing at all')
+def spell_kamehameha():
+    attack_damage = random.randint(20 + player_stats[1], 30 + player_stats[1]) 
+    attack_damage += attack_damage * (player_stats[2] / 100)
+    monster_stats[4] -= int(attack_damage)
+    player_stats[4] += 10
+    print(f'You did {attack_damage} damage to the monster, and healed yourself by 10!')
+    turn = 'stage'
 
 time.sleep(0.5)
 # Game loop
@@ -67,6 +74,8 @@ while phase != 'game over':
                     # Unique Spell slot 1
                     if spell3[0] == 'Nothing':
                         spell_nothing()
+                    elif spell3[0] == 'Kamehameha':
+                        spell_kamehameha()
                     else:
                         attack_damage = random.randint(spell3[2] + player_stats[1], spell3[3] + player_stats[1]) 
                         attack_damage += attack_damage * (player_stats[2] / 100)
@@ -75,8 +84,10 @@ while phase != 'game over':
                     turn = 'stage'
                 elif player_action == '4':
                     # Unique Spell slot 2
-                    if spell3[0] == 'Nothing':
+                    if spell4[0] == 'Nothing':
                         spell_nothing()
+                    elif spell3[0] == 'Kamehameha':
+                        spell_kamehameha()
                     else:
                         attack_damage = random.randint(spell4[2] + player_stats[1], spell4[3] + player_stats[1]) 
                         attack_damage += attack_damage * (player_stats[2] / 100)
@@ -125,6 +136,10 @@ while phase != 'game over':
         # name, initiative, luck, power, max_hp
         if monster_stats[5] == 'Bat':
             monster_stats = statline('Goblin', 75, 3, 50, 250)
+        elif monster_stats[5] == 'Goblin':
+            monster_stats = statline('Matthew', 200, 7, 2000, 400)
+        elif monster_stats[5] == 'Matthew':
+            monster_stats = statline('PJ', 300, 10, -100, 250)
         else:
             monster_stats = statline('Reaper', monster_stats[0] * 2, monster_stats[1] * 2, monster_stats[2] * 2, monster_stats[3] * 2)
         print(f'Up next is a {monster_stats[5]}\n')
