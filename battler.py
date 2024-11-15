@@ -145,10 +145,6 @@ while phase != 'game over':
             if gold > 99:
                 gold -= 100
                 player_stats[3] = player_stats[4]
-        # elif buy == 'Improved boots':
-        #     if gold >= {player_stats[0]}:
-        #         gold -= {player_stats[0]}
-        #         player_stats[0] += 50
         elif buy == 'Nothing':
             phase = 'combat'
         else:
