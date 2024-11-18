@@ -22,9 +22,17 @@ def new_spell(name, description, min_d, max_d, casts):
     return [name, description, min_d, max_d, casts, casts]
 cantrip = new_spell('Firebolt', 'Your basic relyable attack, low damage', 5, 10, 100)
 heal = new_spell('Cure Wounds', 'heal yourself, medium healing', 50, 100, 3)
-spell3 = new_spell('Kamehameha', 'high damage and can heal', 0, 0, 1)
-spell4 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
-print('')
+spell3 = new_spell('Nothing', 'Do nothing at all', 0, 0, 0)
+spell4 = new_spell('Nothing', 'Do nothing at all', 0, 0, 0)
+
+def random_spell(): 
+    rand = random.randint(1, 3)
+    if rand == 1:
+        return new_spell('Kamehameha', 'high damage and can heal', 0, 0, 3)
+    elif rand == 2:
+        return new_spell('Fireball', 'high damage', 30, 50, 10)
+    elif rand == 3:
+        return new_spell('Power Word Kill', 'A single use spell use it wisely', 9999, 9999, 1)
 # Unique Spells
 def spell_nothing():
     print('You do nothing at all')
@@ -34,10 +42,11 @@ def spell_kamehameha():
     monster_stats[4] -= int(attack_damage)
     player_stats[4] += 10
     print(f'You did {attack_damage} damage to the monster, and healed yourself by 10!')
-    turn = 'stage'
 
-time.sleep(0.5)
 # Game loop
+turn = 'stage'
+time.sleep(0.5)
+
 while phase != 'game over':
     # Combat
     while phase == 'combat':
@@ -53,9 +62,9 @@ while phase != 'game over':
             time.sleep(0.5)
             while turn == 'player':
                 print(f'1: {cantrip[0]} : {cantrip[1]}')
-                print(f'2: {heal[0]} : {heal[1]}')
-                print(f'3: {spell3[0]} : {spell3[1]}')
-                print(f'4: {spell4[0]} : {spell4[1]}')
+                print(f'2: {heal[0]} : {heal[1]} : {spell4[5]} casts left (restocks automaticly on shop)')
+                print(f'3: {spell3[0]} : {spell3[1]} : {spell4[5]} casts left')
+                print(f'4: {spell4[0]} : {spell4[1]} : {spell4[5]} casts left')
                 player_action = input('What do you do?:     ')
                 # Player Actions
                 if player_action == '1':
@@ -81,7 +90,11 @@ while phase != 'game over':
                         attack_damage += attack_damage * (player_stats[2] / 100)
                         monster_stats[4] -= int(attack_damage)
                         print(f'You did {attack_damage} damage to the monster!')
-                    turn = 'stage'
+                        spell3[5] -= 1
+                        if spell3[5] == 0:
+                            print(f'You Ran out of casts for {spell3}')
+                            spell3 = new_spell('Nothing', 'Do nothing at all', 0, 0, 0)
+                        turn = 'stage'
                 elif player_action == '4':
                     # Unique Spell slot 2
                     if spell4[0] == 'Nothing':
@@ -93,6 +106,10 @@ while phase != 'game over':
                         attack_damage += attack_damage * (player_stats[2] / 100)
                         monster_stats[4] -= int(attack_damage)
                         print(f'You did {attack_damage} damage to the monster!')
+                        spell4[5] -= 1
+                        if spell4[5] == 0:
+                            print(f'You Ran out of casts for {spell4}')
+                            spell4 = new_spell('Nothing', 'Do nothing at all', 0, 0, 0)
                     turn = 'stage'
                 elif player_action == '/kill':
                     attack_damage = 99999
@@ -121,6 +138,7 @@ while phase != 'game over':
 
         if turn == 'stage':
             # Health Check
+            print()
             time.sleep(0.5)
             if player_stats[4] < 1:
                 phase = 'game over'
@@ -147,24 +165,54 @@ while phase != 'game over':
         phase = 'shop'
 
     while phase == 'shop':
+        heal = new_spell('Cure Wounds', 'heal yourself, medium healing', 50, 100, 3)
         print('\nWelcome to the shop! \nHere is what you can buy\nOr you can buy nothing and leave')
         print(f'you have {gold} gold\n')
 
         # Options
-        print('Full heal: 100')
-        print(f'Improved boots: {player_stats[0]}')
-        print('Nothing: Free!')
+        print('1: Leave store.')
+        print('2: Full heal: 100gp')
+        print(f'3: Improved boots (+ initiative): {player_stats[0]}gp')
+        print(f'4: Combat Training (+ power): {player_stats[2] * 2}gp')
+        print('5: random new spell: 100gp')
         # Player Input
         buy = input('\n ')
-        if buy == 'Full heal':
+        if buy == '2':
             if gold > 99:
                 gold -= 100
                 player_stats[3] = player_stats[4]
-        elif buy == 'Nothing':
+                print('Your health is now maxxed!\n')
+        elif buy == '3':
+            if gold > player_stats[0] - 1:
+                gold -= player_stats[0]
+                player_stats[0] += player_stats[0] / 10
+                print(f'Your initiative is now {player_stats[0]}.\n')
+        elif buy == '4':
+            if gold > (player_stats[2] * 2) - 1:
+                gold -= player_stats[2] * 2
+                player_stats[2] += player_stats[2] / 10
+                print(f'Your power is now {player_stats[2]}.\n')
+        elif buy == '5':
+            if gold > 99:
+                gold -= 100
+                question = input('Which slot do you want he spell in? 3 or 4:   ')
+                if question == '3':
+                    spell3 = random_spell()
+                    print(f'You have a new spell! {spell3[0]}, {spell3[1]}')
+                elif question == '4':
+                    spell4 = random_spell()
+                    print(f'You have a new spell! {spell4[0]}, {spell4[1]}')
+                else:
+                    print('Enter either 3 or 4.')
+        elif buy == '1':
             phase = 'combat'
         else:
-            print('Oops, capitalisation matters\n')
+            print('Oops, try again!\n')
 
+        # Gold Check
+        if gold == 0:
+            print('You have run out of gold...')
+            phase = 'combat'
 if phase == 'game over':
     print('You lose!')
     phase = 'end'
