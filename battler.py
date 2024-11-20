@@ -15,6 +15,7 @@ player_stats = statline(input('what is your name?\n     '), 100, 5, 50, 10000)
 gold = 0
 phase = 'combat'
 
+
 # Spells
 # Spell layout  0 name, 1description 2 min damage, 3 max damage, 4 total casts, 5 casts left, 6+ special effects
 def new_spell(name, description, min_d, max_d, casts):
@@ -43,6 +44,13 @@ def spell_kamehameha():
     player_stats[4] += 10
     print(f'You did {attack_damage} damage to the monster, and healed yourself by 10!')
 
+# Player turn functions
+def options():
+    print(f'1: {cantrip[0]} : {cantrip[1]}')
+    print(f'2: {heal[0]} : {heal[1]} : {heal[5]} casts left (restocks automaticly on shop)')
+    print(f'3: {spell3[0]} : {spell3[1]} : {spell3[5]} casts left')
+    print(f'4: {spell4[0]} : {spell4[1]} : {spell4[5]} casts left')
+
 # Game loop
 turn = 'stage'
 time.sleep(0.5)
@@ -61,10 +69,7 @@ while phase != 'game over':
             print(f'    it is {player_stats[5]}\'s turn.')
             time.sleep(0.5)
             while turn == 'player':
-                print(f'1: {cantrip[0]} : {cantrip[1]}')
-                print(f'2: {heal[0]} : {heal[1]} : {heal[5]} casts left (restocks automaticly on shop)')
-                print(f'3: {spell3[0]} : {spell3[1]} : {spell3[5]} casts left')
-                print(f'4: {spell4[0]} : {spell4[1]} : {spell4[5]} casts left')
+                options()
                 player_action = input('What do you do?:     ')
                 # Player Actions
                 if player_action == '1':
@@ -177,15 +182,18 @@ while phase != 'game over':
         # name, initiative, luck, power, max_hp
         if monster_stats[5] == 'Bat':
             monster_stats = statline('Goblin', 75, 3, 50, 250)
+            monster_intro = 'The first true battle of an adventure'
         elif monster_stats[5] == 'Goblin':
             monster_stats = statline('PJ', 300, 10, 20, 250)
+            monster_intro = 'The first trial to fight the king.'
         elif monster_stats[5] == 'PJ':
             monster_stats = statline('Matthew', 200, 7, 0, 4000)
+            monster_intro = 'The second trial to fight the king.'
         elif monster_stats[5] == 'Mathew':
             monster_stats = statline('Final Boss', 200, 100, 100, 1000)
         else:
             monster_stats = statline('Reaper', monster_stats[0] * 2, monster_stats[1] * 2, monster_stats[2] * 2, monster_stats[3] * 2)
-        print(f'Up next is a {monster_stats[5]}\n')
+        print(f'Up next is a {monster_stats[5]}\n {monster_intro} \n')
         time.sleep(1)
         phase = 'shop'
 
