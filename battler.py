@@ -10,8 +10,8 @@ print('Use "/stats" in combat to see your stats\n')
 def statline(name, initiative, luck, power, max_hp):
     '''Creates new statline'''
     return [initiative, luck, power, max_hp, max_hp, name]
-monster_stats = statline('Bat', 50, 0, 10, 100)
-player_stats = statline(input('what is your name?\n     '), 100, 5, 50, 10000)
+monster_stats = statline('Bat', 50, 0, 10, 50)
+player_stats = statline(input('what is your name?\n     '), 100, 5, 50, 500)
 gold = 0
 phase = 'combat'
 
@@ -60,7 +60,7 @@ while phase != 'game over':
     while phase == 'combat':
         # Turn Decider
         initiative_total = player_stats[0] + monster_stats[0]
-        turn_picker = random.randint(1, initiative_total) - player_stats[1] + monster_stats[1]
+        turn_picker = random.randint(1, initiative_total)
         print('')
         if turn_picker < player_stats[0]:
             # player turn
@@ -86,6 +86,9 @@ while phase != 'game over':
                         attack_damage += attack_damage * (player_stats[2] / 100)
                         player_stats[4] += int(attack_damage)
                         print(f'You healed yourself for {attack_damage} health!')
+                        # max health
+                        if player_stats[4] > player_stats[3]:
+                            player_stats[4] = player_stats[3]
                     heal[5] -= 1
                     if heal[5] == 0:
                         print(f'You Ran out of casts for {heal[0]} (They will restock when you enter the shop)')
@@ -157,11 +160,11 @@ while phase != 'game over':
             print(f'    it is the {monster_stats[5]}\'s turn.')
             time.sleep(0.5)
             while turn == 'monster':
-                # (monster_stats[4] + monster_stats[1], monster_stats[3] + monster_stats[1])
-                attack_damage = random.randint(monster_stats[4], monster_stats[3]) 
-                attack_damage += attack_damage * (monster_stats[2] / 100)
+                percent_health = monster_stats[4] / monster_stats[3]
+                attack_damage = monster_stats[2] + monster_stats[1]
+                attack_damage = attack_damage * (percent_health + 1)
                 player_stats[4] -= int(attack_damage)
-                print(f'The monster attacks for {attack_damage} damage!')
+                print(f'The {monster_stats[5]} attacks for {attack_damage} damage!')
                 turn = 'stage'
 
         if turn == 'stage':
@@ -177,22 +180,48 @@ while phase != 'game over':
     time.sleep(0.5)
     while phase == 'battle won':
         print('\nYou won the battle!')
-        print(f'You got {monster_stats[3]} gold')
-        gold += monster_stats[3]
+        print(f'You got {monster_stats[3] + monster_stats[2] + monster_stats[0]} gold')
+        gold += monster_stats[3] + monster_stats[2] + monster_stats[0]
         # name, initiative, luck, power, max_hp
         if monster_stats[5] == 'Bat':
-            monster_stats = statline('Goblin', 75, 3, 50, 250)
+            monster_stats = statline('Goblin', 75, 3, 50, 100)
             monster_intro = 'The first true battle of an adventure'
+            player_stats[3] += 75
+            player_stats[4] += 75
         elif monster_stats[5] == 'Goblin':
+            monster_stats = statline('Troll', 30, 0, 70, 200)
+            monster_intro = 'A slow powerful monster'
+            player_stats[3] += 75
+            player_stats[4] += 75
+        elif monster_stats[5] == 'Troll':
+            monster_stats = statline('Royal Guard', 150, 30, 100, 200)
+            monster_intro = 'Into the palice no turning back now'
+            player_stats[3] += 75
+            player_stats[4] += 75
+        elif monster_stats[5] == 'Royal Guard':
             monster_stats = statline('PJ', 300, 10, 20, 250)
             monster_intro = 'The first trial to fight the king.'
+            player_stats[3] += 75
+            player_stats[4] += 75
         elif monster_stats[5] == 'PJ':
-            monster_stats = statline('Matthew', 200, 7, 0, 4000)
+            monster_stats = statline('Matthew', 50, 7, 500, 400)
             monster_intro = 'The second trial to fight the king.'
+            player_stats[3] += 75
+            player_stats[4] += 75
         elif monster_stats[5] == 'Mathew':
-            monster_stats = statline('Final Boss', 200, 100, 100, 1000)
+            monster_stats = statline('Trent', 25, 10, 50, 2500)
+            monster_intro = 'The final trial before the king'
+            player_stats[3] += 75
+            player_stats[4] += 75
+        elif monster_stats[5] == 'Trent':
+            monster_stats = statline('King', 100, 10, 100, 1000)
+            monster_intro = 'You finally stand before the king, now strike.'
+            player_stats[3] += 75
+            player_stats[4] += 75
         else:
             monster_stats = statline('Reaper', monster_stats[0] * 2, monster_stats[1] * 2, monster_stats[2] * 2, monster_stats[3] * 2)
+            monster_intro = 'You won! now fall.\nDeath attacks for 1000 damage!'
+            player_stats[4] -= 1000
         print(f'Up next is a {monster_stats[5]}\n {monster_intro} \n')
         time.sleep(1)
         phase = 'shop'
@@ -221,12 +250,12 @@ while phase != 'game over':
         elif buy == '3':
             if gold > player_stats[0] - 1:
                 gold -= player_stats[0]
-                player_stats[0] += player_stats[0] / 10
+                player_stats[0] += int(player_stats[0]) / 10
                 print(f'Your initiative is now {player_stats[0]}.\n')
         elif buy == '4':
             if gold > (player_stats[2] * 2) - 1:
                 gold -= player_stats[2] * 2
-                player_stats[2] += player_stats[2] / 10
+                player_stats[2] += int(player_stats[2]) / 10
                 print(f'Your power is now {player_stats[2]}.\n')
         elif buy == '5':
             if gold > 249:
