@@ -14,7 +14,6 @@ monster_stats = statline('Bat', 50, 0, 10, 50)
 player_stats = statline(input('what is your name?\n     '), 100, 5, 50, 500)
 gold = 140
 phase = 'combat'
-fly = False
 player_haste = 0
 pickspell = False
 # Spells
@@ -25,8 +24,8 @@ def new_spell(name, description, min_d, max_d, casts):
 cantrip = new_spell('Firebolt', 'Your basic relyable attack, low damage', 5, 10, 100)
 heal = new_spell('Cure Wounds', 'heal yourself, medium healing', 50, 100, 3)
 spell3 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
-# spell4 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
-spell4 = new_spell('Dev.kill', 'testing 123', 1000, 1001, 10)
+spell4 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
+# spell4 = new_spell('Dev.kill', 'testing 123', 1000, 1001, 10)
 
 def random_spell():
     global pickspell
@@ -104,7 +103,7 @@ while phase != 'game over':
                     attack_damage = random.randint(cantrip[2] + player_stats[1], cantrip[3] + player_stats[1]) 
                     attack_damage += attack_damage * (player_stats[2] / 100)
                     monster_stats[4] -= int(attack_damage)
-                    print(f'You did {attack_damage} damage to the monster!')
+                    print(f'You did {attack_damage:.0f} damage to the monster!')
                     turn_end()
                 elif player_action == '2':
                     if heal[0] == 'Nothing':
@@ -113,7 +112,7 @@ while phase != 'game over':
                         attack_damage = random.randint(heal[2] + player_stats[1], heal[3] + player_stats[1]) 
                         attack_damage += attack_damage * (player_stats[2] / 100)
                         player_stats[4] += int(attack_damage)
-                        print(f'You healed yourself for {attack_damage} health!')
+                        print(f'You healed yourself for {attack_damage:.0f} health!')
                         # max health
                         if player_stats[4] > player_stats[3]:
                             player_stats[4] = player_stats[3]
@@ -134,7 +133,7 @@ while phase != 'game over':
                         attack_damage = random.randint(spell3[2] + player_stats[1], spell3[3] + player_stats[1]) 
                         attack_damage += attack_damage * (player_stats[2] / 100)
                         monster_stats[4] -= int(attack_damage)
-                        print(f'You did {attack_damage} damage to the monster!')
+                        print(f'You did {attack_damage:.0f} damage to the monster!')
 
                     spell3[5] -= 1
                     if spell3[5] == 0:
@@ -193,11 +192,6 @@ while phase != 'game over':
             # End Of Player turn while
         else:
             # Monster turn
-            if fly == True:
-                fly == False
-                player_stats[0] = int(player_stats[0] / 2)
-                player_stats[2] = int(player_stats[2] / 2)
-                
             turn = 'monster'
             print(f'    it is the {monster_stats[5]}\'s turn.')
             time.sleep(0.5)
@@ -221,7 +215,6 @@ while phase != 'game over':
                 phase = 'battle won'
 
     # End Of combat While statement
-    fly == False
     time.sleep(0.5)
     while phase == 'battle won':
         print('\nYou won the battle!')
@@ -239,7 +232,7 @@ while phase != 'game over':
             player_stats[3] += 75
             player_stats[4] += 75
         elif monster_stats[5] == 'Troll':
-            monster_stats = statline('Royal Guard', 150, 30, 100, 250)
+            monster_stats = statline('Royal Guard', 100, 30, 50, 250)
             monster_intro = 'Into the palice no turning back now'
             player_stats[3] += 75
             player_stats[4] += 75
@@ -279,10 +272,10 @@ while phase != 'game over':
 
         # Options
         print('1: Leave store.')
-        print('2: Full heal: 100gp')
+        print(f'2: Full heal: 100gp {(player_stats[4]/player_stats[3]*100):.0f}% HP')
         print(f'3: PJ\'s boots (+ initiative): {player_stats[0] * 2}gp')
-        print(f'4: Matthew\'s gloves (+ power): {player_stats[2] * 2}gp')
-        print(f'5: Trent\'s Armor (+ max health) {player_stats[3] * 0.5}gp')
+        print(f'4: Matthew\'s gloves (+ power): {player_stats[2] * 4}gp')
+        print(f'5: Trent\'s Armor (+ max health) {player_stats[3] * 0.2}gp')
         print('6: Random new spell: 250gp')
         print('7: Upgrade cantrip: 300gp')
 
@@ -299,13 +292,13 @@ while phase != 'game over':
                 player_stats[0] += int(player_stats[0]) / 10
                 print(f'Your initiative is now {player_stats[0]}.\n')
         elif buy == '4':
-            if gold > (player_stats[2] * 2) - 1:
-                gold -= player_stats[2] * 2
+            if gold > (player_stats[2] * 4) - 1:
+                gold -= player_stats[2] * 4
                 player_stats[2] += int(player_stats[2]) / 10
                 print(f'Your power is now {player_stats[2]}.\n')
         elif buy == '5':
-            if gold > (player_stats[3] * 2) - 1:
-                gold -= player_stats[3] * 0.5
+            if gold > (player_stats[3] * 0.2) - 1:
+                gold -= player_stats[3] * 0.2
                 player_stats[3] += int(player_stats[3]) / 10
                 print(f'Your max health is now {player_stats[3]}.\n')
         elif buy == '6':
@@ -325,8 +318,8 @@ while phase != 'game over':
         elif buy == '7':
             if gold > 299:
                 gold -= 300
-                cantrip[2] += cantrip[2] * 0.1
-                cantrip[3] += cantrip[3] * 0.2
+                cantrip[2] += 1
+                cantrip[3] += 2
         elif buy == '1':
             phase = 'combat'
         else:
