@@ -5,24 +5,62 @@
 import random
 import time
 print('Use "/stats" in combat to see your stats\n')
-# Character creator
+
+# --- Character creator --- #
+def statline(name, initiative, luck, power, max_hp):
+    '''Creates new statline'''
+    return [initiative, luck, power, max_hp, max_hp, name]
+while True:
+    print('What class are you?')
+    print('1: Fighter  (Beginner friendly)')
+    print('2: Mage')
+    print('3: Rouge')
+    player_class = int(input("Awaiting Input: "))
+    print()
+    # Class picker
+    if player_class == 1:
+        player_class = 'Fighter'
+        player_stats = statline(input(f'what is your name, {player_class}?\n     '), 100, -1, 75, 250)
+        break
+    elif player_class == 2:
+        player_class = 'Mage'
+        player_stats = statline(input(f'what is your name, {player_class}?\n     '), 75, 0, 125, 75)
+        break
+    elif player_class == 3:
+        player_class = 'Rouge'
+        player_stats = statline(input(f'what is your name, {player_class}?\n     '), 200, 2, 0, 150)
+        break
+    else:
+        print('oops try again!\n')
+        time.sleep(1)
+
 # stat order:   0 initiative, 1 luck, 2 power, 3 max health, 4 current health, 5 name
 def statline(name, initiative, luck, power, max_hp):
     '''Creates new statline'''
     return [initiative, luck, power, max_hp, max_hp, name]
 monster_stats = statline('Bat', 50, 0, 10, 25)
-player_stats = statline(input('what is your name?\n     '), 100, 0, 50, 100)
 gold = 100
 phase = 'combat'
 player_haste = 0
 pickspell = False
-# Spells
+
+# --- Spells --- #
+
 # Spell layout  0 name, 1description 2 min damage, 3 max damage, 4 total casts, 5 casts left, 6+ special effects
 def new_spell(name, description, min_d, max_d, casts):
     '''Creates new basic spell'''
     return [name, description, min_d, max_d, casts, casts]
-cantrip = new_spell('Firebolt', 'Your basic relyable attack, low damage', 5, 10, 100)
-heal = new_spell('Cure Wounds', 'heal yourself, medium healing', 50, 100, 3)
+# Starter spells
+if player_class == 'Mage':
+    cantrip = new_spell('Firebolt', 'Your basic relyable attack, low damage', 5, 10, 100)
+    heal = new_spell('Cure Wounds', 'heal yourself, medium healing', 30, 70, 3)
+elif player_class == 'Fighter':
+    cantrip = new_spell('Firebolt', 'Your basic relyable attack, low damage', 5, 10, 100)
+    heal = new_spell('Cure Wounds', 'heal yourself, medium healing', 30, 70, 3)
+elif player_class == 'Rouge':
+    cantrip = new_spell('Firebolt', 'Your basic relyable attack, low damage', 5, 10, 100)
+    heal = new_spell('Cure Wounds', 'heal yourself, medium healing', 30, 70, 3)
+    
 spell3 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
 spell4 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
 # spell4 = new_spell('Dev.kill', 'testing 123', 1000, 1001, 10)
@@ -54,7 +92,7 @@ def random_spell():
     elif rand == 7:
         player_stats[1] -= 1
         return new_spell('Haste', 'Take 2 additional actions (stacks)', 0, 0, 5)
-# Unique Spells
+#  --- Unique Spells --- #
 def spell_nothing():
     print('You do nothing at all')
 
@@ -69,7 +107,8 @@ def spell_haste():
     global player_haste
     player_haste += 3
 
-# Player & turn functions
+# --- Player & turn functions --- #
+    
 def options():
     print(f'1: {cantrip[0]} : {cantrip[1]}')
     print(f'2: {heal[0]} : {heal[1]} : {heal[5]} casts left (restocks automaticly on shop)')
@@ -85,7 +124,8 @@ def turn_end():
         time.sleep(0.5)
     else:
         turn = 'stage'
-
+        print('****************************')
+# Level up
 def levelup(exp):
     print(f'You leveled up!')
     player_stats[2] += exp / 10
@@ -94,19 +134,21 @@ def levelup(exp):
     player_stats[0] += exp / 2
     print(f'You got {exp * 30} gold')
     return exp * 30
-# Game loop
+
+# --- GAME LOOP --- #
+
 turn = 'stage'
 time.sleep(0.5)
 
 while phase != 'game over':
-    # Combat
+    # --- Combat --- #
     while phase == 'combat':
         # Turn Decider
         initiative_total = player_stats[0] + monster_stats[0]
-        turn_picker = random.randint(1, initiative_total)
-        print('')
+        turn_picker = random.randint(1.0, int(initiative_total))
+        print()
         if turn_picker < player_stats[0]:
-            # player turn
+            # --- PLAYER TURN --- #
             turn = 'player'
             # Give information
             print(f'    it is {player_stats[5]}\'s turn.')
@@ -121,6 +163,7 @@ while phase != 'game over':
                     monster_stats[4] -= int(attack_damage)
                     print(f'You did {attack_damage:.0f} damage to the monster!')
                     turn_end()
+
                 elif player_action == '2':
                     if heal[0] == 'Nothing':
                         spell_nothing()
@@ -129,7 +172,7 @@ while phase != 'game over':
                         attack_damage += attack_damage * (player_stats[2] / 100)
                         player_stats[4] += int(attack_damage)
                         print(f'You healed yourself for {attack_damage:.0f} health!')
-                        # max health
+                        # max health enforcer
                         if player_stats[4] > player_stats[3]:
                             player_stats[4] = player_stats[3]
                     heal[5] -= 1
@@ -137,8 +180,9 @@ while phase != 'game over':
                         print(f'You Ran out of casts for {heal[0]} (They will restock when you enter the shop)')
                         heal = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
                     turn_end()
+
                 elif player_action == '3':
-                    # Unique Spell slot 1
+                    # -- Unique Spell slot 1 -- #
                     if spell3[0] == 'Nothing':
                         spell_nothing()
                     elif spell3[0] == 'Drain Life':
@@ -156,8 +200,9 @@ while phase != 'game over':
                         print(f'You Ran out of casts for {spell3[0]}')
                         spell3 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
                     turn_end()
+
                 elif player_action == '4':
-                    # Unique Spell slot 2
+                    # -- Unique Spell slot 2 -- #
                     if spell4[0] == 'Nothing':
                         spell_nothing()
                     elif spell4[0] == 'Drain Life':
@@ -175,7 +220,9 @@ while phase != 'game over':
                         print(f'You Ran out of casts for {spell4[1]}')
                         spell4 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
                     turn_end()
+
                 elif player_action == '/devmode':
+                    # devmode
                     player_stats[5] = 'dev'
                     print('You have entered devmode, type "exit" to leave...')
                     while turn == 'player':
@@ -195,6 +242,7 @@ while phase != 'game over':
                             print('Success \n')
                         else:
                             print('invalid command')
+                            
                 elif player_action == '/stats':
                     print(f'\nYour health is {int(player_stats[4])}/{int(player_stats[3])}')
                     print(f'{monster_stats[5]} health is {int(monster_stats[4])}/{int(monster_stats[3])} \n')
@@ -202,12 +250,15 @@ while phase != 'game over':
                 else:
                     print('Oops that wasn\'t an option try again (1, 2, 3, or 4)')
                     time.sleep(0.5)
-            # End Of Player turn while
+
+            # --- End Of Player turn while --- #
+                    
         else:
-            # Monster turn
+            # --- MONSTER TURN --- #
             turn = 'monster'
             print(f'    it is the {monster_stats[5]}\'s turn.')
             time.sleep(0.5)
+
             while turn == 'monster':
                 percent_health = monster_stats[4] / monster_stats[3]
                 if percent_health > 0.5:
@@ -216,8 +267,10 @@ while phase != 'game over':
                 attack_damage = attack_damage * (percent_health + 0.5)
                 player_stats[4] -= int(attack_damage)
                 print(f'The {monster_stats[5]} attacks for {attack_damage:.0f} damage!')
+                print('****************************')
                 turn = 'stage'
-
+        
+        # --- STAGE CHECK --- #
         if turn == 'stage':
             # Health Check
             print()
@@ -227,9 +280,12 @@ while phase != 'game over':
             elif monster_stats[4] < 1:
                 phase = 'battle won'
 
-    # End Of combat While statement
+    # --- End Of combat While statement --- #
+                
     time.sleep(0.5)
+    # --- BATTLE WON --- #
     while phase == 'battle won':
+        print('\n#########################')
         print('\nYou won the battle!')
         # name, initiative, luck, power, max_hp
         if monster_stats[5] == 'Bat':
@@ -268,8 +324,9 @@ while phase != 'game over':
         time.sleep(1)
         phase = 'shop'
 
+    # --- SHOP --- #
     while phase == 'shop':
-        heal = new_spell('Cure Wounds', 'heal yourself, medium healing', 50, 100, 3)
+        heal = new_spell('Cure Wounds', 'heal yourself, medium healing', 30, 70, 3)
         print('\nWelcome to the shop! \nHere is what you can buy\nOr you can buy nothing and leave')
         print(f'you have {gold} gold\n')
         time.sleep(0.5)
@@ -283,29 +340,33 @@ while phase != 'game over':
         print('6: Random new spell: 250gp')
         print('7: Upgrade cantrip: 300gp')
 
-        # Player Input
+        # Player Input (BUY STUFF) --- #
         buy = input('\n ')
-        if buy == '2':
+        if buy == '2': # Heal
             if gold > 99:
                 gold -= 100
                 player_stats[4] = player_stats[3]
                 print('Your health is now maxxed!\n')
-        elif buy == '3':
+
+        elif buy == '3': # Speed
             if gold > player_stats[0] - 1:
                 gold -= player_stats[0] * 2
                 player_stats[0] += int(player_stats[0]) / 10
                 print(f'Your initiative is now {player_stats[0]}.\n')
-        elif buy == '4':
+
+        elif buy == '4': # Power
             if gold > (player_stats[2] * 4) - 1:
                 gold -= player_stats[2] * 4
                 player_stats[2] += int(player_stats[2]) / 10
                 print(f'Your power is now {player_stats[2]}.\n')
-        elif buy == '5':
+
+        elif buy == '5': # Max Health
             if gold > (player_stats[3] * 0.2) - 1:
                 gold -= player_stats[3] * 0.2
                 player_stats[3] += int(player_stats[3] / 10)
                 print(f'Your max health is now {player_stats[3]}.\n')
-        elif buy == '6':
+
+        elif buy == '6': # New Spell
             if gold > 249:
                 gold -= 250
                 question = input('Which slot do you want the spell in? 3 or 4:   ')
@@ -319,12 +380,15 @@ while phase != 'game over':
                 else:
                     print('Enter either 3 or 4.')
                 time.sleep(1)
-        elif buy == '7':
+
+        elif buy == '7': # Upgrade cantrip
             if gold > 299:
                 gold -= 300
                 cantrip[2] += 1
                 cantrip[3] += 2
-        elif buy == '1':
+
+        elif buy == '1': # Quit
+            print('#########################')
             phase = 'combat'
         else:
             print('Oops, try again!\n')
@@ -333,6 +397,7 @@ while phase != 'game over':
         # Gold Check
         if gold == 0:
             print('You have run out of gold...')
+            print('#########################')
             phase = 'combat'
 if phase == 'game over':
     print('You lose!')
