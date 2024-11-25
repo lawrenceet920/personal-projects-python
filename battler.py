@@ -10,9 +10,9 @@ print('Use "/stats" in combat to see your stats\n')
 def statline(name, initiative, luck, power, max_hp):
     '''Creates new statline'''
     return [initiative, luck, power, max_hp, max_hp, name]
-monster_stats = statline('Bat', 50, 0, 10, 50)
-player_stats = statline(input('what is your name?\n     '), 100, 5, 50, 500)
-gold = 40
+monster_stats = statline('Bat', 50, 0, 10, 25)
+player_stats = statline(input('what is your name?\n     '), 100, 0, 50, 100)
+gold = 100
 phase = 'combat'
 player_haste = 0
 pickspell = False
@@ -28,25 +28,32 @@ spell4 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
 # spell4 = new_spell('Dev.kill', 'testing 123', 1000, 1001, 10)
 
 def random_spell():
-    global pickspell
-    if pickspell == True:
-        rand = input('Enter spell ID:   ')
-    else:
-        rand = random.randint(1, 7)
+    SPELL_COUNT = 7
+    rand = random.randint(1, SPELL_COUNT)
+    # Luck modifier
+    rand += int(player_stats[1])
+    if rand > SPELL_COUNT:
+        rand = SPELL_COUNT
+    elif rand < 1:
+        rand = 1
+    # pick spell from list based on roll + luck
     if rand == 1:
-        return new_spell('Drain Life', 'Medium damage and heal', 0, 0, 3)
+        player_stats[1] += 2
+        return new_spell('Quarter-staff', 'Low damage', 7, 13, 100)
     elif rand == 2:
-        return new_spell('Fireball', 'high damage', 30, 50, 5)
-    elif rand == 3:
-        return new_spell('Power Word Kill', 'A single use spell use it wisely', 9998, 9999, 1)
-    elif rand == 4:
+        player_stats[1] += 1
         return new_spell('Lightning', 'Meduim damage', 20, 30, 10)
+    elif rand == 3:
+        return new_spell('Drain Life', 'Medium damage and heal', 0, 0, 3)
+    elif rand == 4:
+        return new_spell('Fireball', 'high damage', 30, 50, 5)
     elif rand == 5:
         return new_spell('Chaos Bolt', 'Wildly varying damage', 0, 100, 5)
     elif rand == 6:
-        return new_spell('Quarter-staff', 'Low damage', 7, 13, 100)
+        return new_spell('Power Word Kill', 'A single use spell use it wisely', 9998, 9999, 1)
     elif rand == 7:
-        return new_spell('Haste', 'Take 3 additional actions (stacks)', 0, 0, 2)
+        player_stats[1] -= 1
+        return new_spell('Haste', 'Take 2 additional actions (stacks)', 0, 0, 5)
 # Unique Spells
 def spell_nothing():
     print('You do nothing at all')
@@ -60,7 +67,7 @@ def spell_drain_life():
 
 def spell_haste():
     global player_haste
-    player_haste += 4
+    player_haste += 3
 
 # Player & turn functions
 def options():
@@ -78,6 +85,15 @@ def turn_end():
         time.sleep(0.5)
     else:
         turn = 'stage'
+
+def levelup(exp):
+    print(f'You leveled up!')
+    player_stats[2] += exp / 10
+    player_stats[3] += exp
+    player_stats[4] += exp
+    player_stats[0] += exp / 2
+    print(f'You got {exp * 30} gold')
+    return exp * 30
 # Game loop
 turn = 'stage'
 time.sleep(0.5)
@@ -174,9 +190,6 @@ while phase != 'game over':
                         elif player_action == 'fail':
                             player_stats[4] = 0
                             print('Success')
-                        elif player_action == 'pickspell':
-                            pickspell = True
-                            print('Success')
                         elif player_action == 'exit':
                             turn = 'stage'
                             print('Success \n')
@@ -218,44 +231,35 @@ while phase != 'game over':
     time.sleep(0.5)
     while phase == 'battle won':
         print('\nYou won the battle!')
-        print(f'You got {monster_stats[3] + monster_stats[2] + monster_stats[0] + 100} gold')
-        gold += monster_stats[3] + monster_stats[2] + monster_stats[0] + 100
         # name, initiative, luck, power, max_hp
         if monster_stats[5] == 'Bat':
-            monster_stats = statline('Goblin', 75, 0, 50, 100)
+            gold += levelup(5)
+            monster_stats = statline('Goblin', 75, 0, 10, 70)
             monster_intro = 'The first true battle of an adventure'
-            player_stats[3] += 75
-            player_stats[4] += 75
         elif monster_stats[5] == 'Goblin':
-            monster_stats = statline('Troll', 30, 0, 70, 200)
+            gold += levelup(10)
+            monster_stats = statline('Troll', 30, 0, 30, 150)
             monster_intro = 'A slow powerful monster'
-            player_stats[3] += 75
-            player_stats[4] += 75
         elif monster_stats[5] == 'Troll':
-            monster_stats = statline('Royal Guard', 100, 0, 50, 250)
+            gold += levelup(15)
+            monster_stats = statline('Royal Guard', 100, 0, 20, 100)
             monster_intro = 'Into the palice no turning back now'
-            player_stats[3] += 75
-            player_stats[4] += 75
         elif monster_stats[5] == 'Royal Guard':
-            monster_stats = statline('PJ', 400, 0, 20, 350)
+            gold += levelup(20)
+            monster_stats = statline('PJ', 400, 0, 20, 200)
             monster_intro = 'The first trial to fight the king.'
-            player_stats[3] += 75
-            player_stats[4] += 75
         elif monster_stats[5] == 'PJ':
-            monster_stats = statline('Matthew', 50, 0, 500, 400)
+            gold += levelup(30)
+            monster_stats = statline('Matthew', 25, 0, 100, 250)
             monster_intro = 'The second trial to fight the king.'
-            player_stats[3] += 75
-            player_stats[4] += 75
-        elif monster_stats[5] == 'Mathew':
-            monster_stats = statline('Trent', 25, 0, 50, 2500)
+        elif monster_stats[5] == 'Matthew':
+            gold += levelup(30)
+            monster_stats = statline('Trent', 100, 0, 20, 500)
             monster_intro = 'The final trial before the king'
-            player_stats[3] += 75
-            player_stats[4] += 75
         elif monster_stats[5] == 'Trent':
-            monster_stats = statline('King', 100, 0, 100, 1000)
+            gold += levelup(30)
+            monster_stats = statline('King', player_stats[1], 0, player_stats[2], player_stats[3])
             monster_intro = 'You finally stand before the king, now strike.'
-            player_stats[3] += 75
-            player_stats[4] += 75
         else:
             monster_stats = statline('Reaper', monster_stats[0] * 2, monster_stats[1] * 2, monster_stats[2] * 2, monster_stats[3] * 2)
             monster_intro = 'You won! now fall.\nDeath attacks for 500 damage!'
