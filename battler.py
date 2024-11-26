@@ -42,6 +42,7 @@ monster_stats = statline('Bat', 50, 0, 10, 25)
 gold = 100
 phase = 'combat'
 player_haste = 0
+monster_slow = 0
 strength = 1
 pickspell = False
 
@@ -56,7 +57,7 @@ if player_class == 'Mage':
     cantrip = new_spell('Firebolt', 'Your basic relyable attack, low damage', 5, 10, 100)
     heal = new_spell('Cure Wounds', 'heal yourself, high healing', 30, 70, 3)
 elif player_class == 'Fighter':
-    cantrip = new_spell('Sword', 'Your basic relyable attack, low damage', 5, 10, 100)
+    cantrip = new_spell('Sword', 'Your basic relyable attack, low damage', 6, 13, 100)
     heal = new_spell('Second Wind', 'heal yourself, full healing', 1000, 1001, 1)
 elif player_class == 'Rouge':
     cantrip = new_spell('Dagger', 'Your basic relyable attack, low damage', 5, 10, 100)
@@ -91,19 +92,20 @@ def random_spell():
         elif rand == 5:
             return new_spell('Chaos Bolt', 'Wildly varying damage', 0, 100, 5)
         elif rand == 6:
-            return new_spell('Power Word Kill', 'A single use spell use it wisely', 9998, 9999, 1)
+            return new_spell('Slow', 'Skip the monsters next turn', 0, 0, 1)
         elif rand == 7:
             player_stats[1] -= 1
-            return new_spell('Haste', 'Take 2 additional actions (stacks)', 0, 0, 5)
+            return new_spell('Teleport', 'Go directly to the shop (gain 500 gold) and then return to the fight', 0, 0, 1)
+        # Fighter
     elif player_class == 'Fighter':
         if rand == 1:
             player_stats[1] += 2
-            return new_spell('Mace', 'Low damage', 7, 13, 100)
+            return new_spell('Mace', 'low damage', 15, 20, 5)
         elif rand == 2:
             player_stats[1] += 1
-            return new_spell('Greatsword', 'Meduim damage', 15, 25, 20)
+            return new_spell('Greatsword', 'Meduim relyable damage', 20, 25, 20)
         elif rand == 3:
-            return new_spell('Drain Life', 'Medium damage and heal', 0, 0, 3)
+            return new_spell('Warpick', 'Gain gold equil to damage, Meduim damage', 0, 0, 5)
         elif rand == 4:
             return new_spell('Greataxe', 'high damage', 25, 40, 10)
         elif rand == 5:
@@ -112,7 +114,26 @@ def random_spell():
             return new_spell('Potion of Strength', 'Do far more damage for an attack', 0, 0, 1)
         elif rand == 7:
             player_stats[1] -= 1
-            return new_spell('Warpick', 'Gain gold equil to damage, Meduim damage', 0, 0, 5)
+            return new_spell('Potion of Giant\'s Strength', 'A single use potion use it wisely', 999998, 999999, 1)
+        # Rouge
+    elif player_class == 'Rouge':
+        if rand == 1:
+            player_stats[1] += 2
+            return new_spell('Twin Daggers', 'Low damage', 7, 13, 100)
+        elif rand == 2:
+            player_stats[1] += 1
+            return new_spell('Poisoned Dagger', 'Meduim damage', 15, 25, 20)
+        elif rand == 3:
+            return new_spell('Net', 'Slow down your foe for the rest of the encounter', 0, 0, 1)
+        elif rand == 4:
+            return new_spell('Crystal Dagger', 'high damage', 25, 100, 3)
+        elif rand == 5:
+            return new_spell('Potion of grand healing', 'Fully Heal', 0, 0, 1)
+        elif rand == 6:
+            return new_spell('Haste', 'Take 2 additional actions (stacks)', 0, 0, 5)
+        elif rand == 7:
+            player_stats[1] -= 1
+            return new_spell('Friendly Mimic', 'Gain a random ability (with +3 luck)', 0, 0, 2)
 #  --- Unique Spells --- #
 def spell_nothing():
     print('You do nothing at all')
@@ -127,6 +148,12 @@ def spell_drain_life():
 def spell_haste():
     global player_haste
     player_haste += 3
+def spell_slow():
+    global monster_slow
+    monster_slow += 1
+
+def spell_net():
+    monster_stats[0] = monster_stats[0] / 2
 
 def spell_strength_potion():
     global strength
@@ -140,6 +167,42 @@ def spell_warpick():
     monster_stats[4] -= int(attack_damage)
     gold += int(attack_damage)
     print(f'You did {attack_damage} damage to the monster, and gained that much gold')
+
+def spell_mimic():
+    mimic = random.randint(1, 3)
+    global player_class
+    if mimic == 1:
+        player_class = 'Mage'
+    elif mimic == 2:
+        player_class = 'Fighter'
+    mimic = True
+    player_stats[1] += 3
+    while mimic == True: # False store
+        question = input('Which slot do you want the spell in? 3 or 4:   ')
+        time.sleep(0.5)
+        if question == '3':
+            spell3 = random_spell()
+            print(f'You have a new spell! {spell3[0]}, {spell3[1]}')
+            mimic = False
+        elif question == '4':
+            spell4 = random_spell()
+            print(f'You have a new spell! {spell4[0]}, {spell4[1]}')
+            mimic = False
+        else:
+            print('Enter either 3 or 4.')
+    player_class = 'Rouge'
+    player_stats[1] -= 3
+
+def spell_grand_heal():
+    player_stats[4] = player_stats[3]
+    print('Your health is now maxxed!\n')
+
+def spell_teleport():
+    global phase
+    global gold
+    phase = 'shop'
+    gold += 500
+
 # --- Player & turn functions --- #
     
 def options():
@@ -231,6 +294,14 @@ while phase != 'game over':
                         spell_strength_potion()
                     elif spell3[0] == 'Warpick':
                         spell_warpick()
+                    elif spell3[0] == 'Potion of grand healing':
+                        spell_grand_heal()
+                    elif spell3[0] == 'Friendly Mimic':
+                        spell_mimic()
+                    elif spell3[0] == 'Slow':
+                        spell_slow()
+                    elif spell3[0] == 'Teleport':
+                        spell_teleport()
                     else:
                         attack_damage = random.randint(spell3[2], spell3[3]) 
                         attack_damage += attack_damage * (player_stats[2] / 100)
@@ -251,6 +322,18 @@ while phase != 'game over':
                         spell_drain_life()
                     elif spell4[0] == 'Haste':
                         spell_haste()
+                    elif spell4[0] == 'Potion of Strength':
+                        spell_strength_potion()
+                    elif spell4[0] == 'Warpick':
+                        spell_warpick()
+                    elif spell4[0] == 'Potion of grand healing':
+                        spell_grand_heal()
+                    elif spell4[0] == 'Friendly Mimic':
+                        spell_mimic()
+                    elif spell4[0] == 'Slow':
+                        spell_slow()
+                    elif spell4[0] == 'Teleport':
+                        spell_teleport()
                     else:
                         attack_damage = random.randint(spell4[2] + player_stats[1], spell4[3] + player_stats[1]) 
                         attack_damage += attack_damage * (player_stats[0] / 100)
@@ -302,13 +385,17 @@ while phase != 'game over':
             time.sleep(0.5)
 
             while turn == 'monster':
-                percent_health = monster_stats[4] / monster_stats[3]
-                if percent_health > 0.5:
-                    percent_health = 0.5
-                attack_damage = monster_stats[2] + monster_stats[1]
-                attack_damage = attack_damage * (percent_health + 0.5)
-                player_stats[4] -= int(attack_damage)
-                print(f'The {monster_stats[5]} attacks for {attack_damage:.0f} damage!')
+                if monster_slow == 0:
+                    percent_health = monster_stats[4] / monster_stats[3]
+                    if percent_health > 0.5:
+                        percent_health = 0.5
+                    attack_damage = monster_stats[2] + monster_stats[1]
+                    attack_damage = attack_damage * (percent_health + 0.5)
+                    player_stats[4] -= int(attack_damage)
+                    print(f'The {monster_stats[5]} attacks for {attack_damage:.0f} damage!')
+                else:
+                    monster_slow = 0
+                    print('The slow spell ends')
                 print('****************************')
                 turn = 'stage'
         
