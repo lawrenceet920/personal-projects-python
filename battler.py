@@ -42,6 +42,7 @@ monster_stats = statline('Bat', 50, 0, 10, 25)
 gold = 100
 phase = 'combat'
 player_haste = 0
+strength = 1
 pickspell = False
 
 # --- Spells --- #
@@ -53,13 +54,13 @@ def new_spell(name, description, min_d, max_d, casts):
 # Starter spells
 if player_class == 'Mage':
     cantrip = new_spell('Firebolt', 'Your basic relyable attack, low damage', 5, 10, 100)
-    heal = new_spell('Cure Wounds', 'heal yourself, medium healing', 30, 70, 3)
+    heal = new_spell('Cure Wounds', 'heal yourself, high healing', 30, 70, 3)
 elif player_class == 'Fighter':
-    cantrip = new_spell('Firebolt', 'Your basic relyable attack, low damage', 5, 10, 100)
-    heal = new_spell('Cure Wounds', 'heal yourself, medium healing', 30, 70, 3)
+    cantrip = new_spell('Sword', 'Your basic relyable attack, low damage', 5, 10, 100)
+    heal = new_spell('Second Wind', 'heal yourself, full healing', 1000, 1001, 1)
 elif player_class == 'Rouge':
-    cantrip = new_spell('Firebolt', 'Your basic relyable attack, low damage', 5, 10, 100)
-    heal = new_spell('Cure Wounds', 'heal yourself, medium healing', 30, 70, 3)
+    cantrip = new_spell('Dagger', 'Your basic relyable attack, low damage', 5, 10, 100)
+    heal = new_spell('Bandages', 'heal yourself, medium healing', 20, 30, 5)
     
 spell3 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
 spell4 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
@@ -68,6 +69,7 @@ spell4 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
 def random_spell():
     SPELL_COUNT = 7
     rand = random.randint(1, SPELL_COUNT)
+    global player_class
     # Luck modifier
     rand += int(player_stats[1])
     if rand > SPELL_COUNT:
@@ -75,23 +77,42 @@ def random_spell():
     elif rand < 1:
         rand = 1
     # pick spell from list based on roll + luck
-    if rand == 1:
-        player_stats[1] += 2
-        return new_spell('Quarter-staff', 'Low damage', 7, 13, 100)
-    elif rand == 2:
-        player_stats[1] += 1
-        return new_spell('Lightning', 'Meduim damage', 20, 30, 10)
-    elif rand == 3:
-        return new_spell('Drain Life', 'Medium damage and heal', 0, 0, 3)
-    elif rand == 4:
-        return new_spell('Fireball', 'high damage', 30, 50, 5)
-    elif rand == 5:
-        return new_spell('Chaos Bolt', 'Wildly varying damage', 0, 100, 5)
-    elif rand == 6:
-        return new_spell('Power Word Kill', 'A single use spell use it wisely', 9998, 9999, 1)
-    elif rand == 7:
-        player_stats[1] -= 1
-        return new_spell('Haste', 'Take 2 additional actions (stacks)', 0, 0, 5)
+    if player_class == 'Mage': # Mage Spells
+        if rand == 1:
+            player_stats[1] += 2
+            return new_spell('Quarter-staff', 'Low damage', 7, 13, 100)
+        elif rand == 2:
+            player_stats[1] += 1
+            return new_spell('Lightning', 'Meduim damage', 20, 30, 10)
+        elif rand == 3:
+            return new_spell('Drain Life', 'Medium damage and heal', 0, 0, 3)
+        elif rand == 4:
+            return new_spell('Fireball', 'high damage', 30, 50, 5)
+        elif rand == 5:
+            return new_spell('Chaos Bolt', 'Wildly varying damage', 0, 100, 5)
+        elif rand == 6:
+            return new_spell('Power Word Kill', 'A single use spell use it wisely', 9998, 9999, 1)
+        elif rand == 7:
+            player_stats[1] -= 1
+            return new_spell('Haste', 'Take 2 additional actions (stacks)', 0, 0, 5)
+    elif player_class == 'Fighter':
+        if rand == 1:
+            player_stats[1] += 2
+            return new_spell('Mace', 'Low damage', 7, 13, 100)
+        elif rand == 2:
+            player_stats[1] += 1
+            return new_spell('Greatsword', 'Meduim damage', 15, 25, 20)
+        elif rand == 3:
+            return new_spell('Drain Life', 'Medium damage and heal', 0, 0, 3)
+        elif rand == 4:
+            return new_spell('Greataxe', 'high damage', 25, 40, 10)
+        elif rand == 5:
+            return new_spell('Flame Sword', 'HUGE damage', 70, 100, 3)
+        elif rand == 6:
+            return new_spell('Potion of Strength', 'Do far more damage for an attack', 0, 0, 1)
+        elif rand == 7:
+            player_stats[1] -= 1
+            return new_spell('Warpick', 'Gain gold equil to damage, Meduim damage', 0, 0, 5)
 #  --- Unique Spells --- #
 def spell_nothing():
     print('You do nothing at all')
@@ -107,6 +128,18 @@ def spell_haste():
     global player_haste
     player_haste += 3
 
+def spell_strength_potion():
+    global strength
+    if strength == 0:
+        player_stats[2] += player_stats[2]
+        strength = 2
+
+def spell_warpick():
+    attack_damage = random.randint(10, 30) 
+    attack_damage += attack_damage * (player_stats[2] / 100)
+    monster_stats[4] -= int(attack_damage)
+    gold += int(attack_damage)
+    print(f'You did {attack_damage} damage to the monster, and gained that much gold')
 # --- Player & turn functions --- #
     
 def options():
@@ -118,6 +151,11 @@ def options():
 def turn_end():
     global turn
     global player_haste
+    global strength
+    if strength != 0:
+        strength -= 1
+        if strength == 0:
+            player_stats[2] = player_stats[2] / 2
     if player_haste > 0:
         player_haste -= 1
         print(f'\nYou are hasted ({player_haste} turns left)\n')
@@ -189,6 +227,10 @@ while phase != 'game over':
                         spell_drain_life()
                     elif spell3[0] == 'Haste':
                         spell_haste()
+                    elif spell3[0] == 'Potion of Strength':
+                        spell_strength_potion()
+                    elif spell3[0] == 'Warpick':
+                        spell_warpick()
                     else:
                         attack_damage = random.randint(spell3[2], spell3[3]) 
                         attack_damage += attack_damage * (player_stats[2] / 100)
@@ -283,6 +325,9 @@ while phase != 'game over':
     # --- End Of combat While statement --- #
                 
     time.sleep(0.5)
+    if strength != 0:
+        strength = 0
+        player_stats[2] = player_stats[2] / 2
     # --- BATTLE WON --- #
     while phase == 'battle won':
         print('\n#########################')
@@ -326,7 +371,12 @@ while phase != 'game over':
 
     # --- SHOP --- #
     while phase == 'shop':
-        heal = new_spell('Cure Wounds', 'heal yourself, medium healing', 30, 70, 3)
+        if player_class == 'Mage':
+            heal = new_spell('Cure Wounds', 'heal yourself, high healing', 30, 70, 3)
+        elif player_class == 'Fighter':
+            heal = new_spell('Second Wind', 'heal yourself, full healing', 1000, 1001, 1)
+        elif player_class == 'Rouge':
+            heal = new_spell('Bandages', 'heal yourself, medium healing', 20, 30, 5)
         print('\nWelcome to the shop! \nHere is what you can buy\nOr you can buy nothing and leave')
         print(f'you have {gold} gold\n')
         time.sleep(0.5)
