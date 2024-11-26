@@ -65,7 +65,6 @@ elif player_class == 'Rouge':
     
 spell3 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
 spell4 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
-# spell4 = new_spell('Dev.kill', 'testing 123', 1000, 1001, 10)
 
 def random_spell():
     SPELL_COUNT = 7
@@ -92,10 +91,10 @@ def random_spell():
         elif rand == 5:
             return new_spell('Chaos Bolt', 'Wildly varying damage', 0, 100, 5)
         elif rand == 6:
-            return new_spell('Slow', 'Skip the monsters next turn', 0, 0, 1)
+            return new_spell('Slow', 'Skip the monsters next turn', 0, 0, 1)    # Test me
         elif rand == 7:
             player_stats[1] -= 1
-            return new_spell('Teleport', 'Go directly to the shop (gain 500 gold) and then return to the fight', 0, 0, 1)
+            return new_spell('Teleport', 'Go directly to the shop (gain 500 gold) and then return to the fight', 0, 0, 1)   # Test me
         # Fighter
     elif player_class == 'Fighter':
         if rand == 1:
@@ -105,13 +104,13 @@ def random_spell():
             player_stats[1] += 1
             return new_spell('Greatsword', 'Meduim relyable damage', 20, 25, 20)
         elif rand == 3:
-            return new_spell('Warpick', 'Gain gold equil to damage, Meduim damage', 0, 0, 5)
+            return new_spell('Warpick', 'Gain gold equil to damage, Meduim damage', 0, 0, 5)    # Test me
         elif rand == 4:
             return new_spell('Greataxe', 'high damage', 25, 40, 10)
         elif rand == 5:
             return new_spell('Flame Sword', 'HUGE damage', 70, 100, 3)
         elif rand == 6:
-            return new_spell('Potion of Strength', 'Do far more damage for an attack', 0, 0, 1)
+            return new_spell('Potion of Strength', 'Do far more damage for an attack', 0, 0, 1)     # Test me
         elif rand == 7:
             player_stats[1] -= 1
             return new_spell('Potion of Giant\'s Strength', 'A single use potion use it wisely', 999998, 999999, 1)
@@ -124,16 +123,16 @@ def random_spell():
             player_stats[1] += 1
             return new_spell('Poisoned Dagger', 'Meduim damage', 15, 25, 20)
         elif rand == 3:
-            return new_spell('Net', 'Slow down your foe for the rest of the encounter', 0, 0, 1)
+            return new_spell('Net', 'Slow down your foe for the rest of the encounter', 0, 0, 1)    # Test me
         elif rand == 4:
             return new_spell('Crystal Dagger', 'high damage', 25, 100, 3)
         elif rand == 5:
-            return new_spell('Potion of grand healing', 'Fully Heal', 0, 0, 1)
+            return new_spell('Potion of grand healing', 'Fully Heal', 0, 0, 1)      # Test me
         elif rand == 6:
             return new_spell('Haste', 'Take 2 additional actions (stacks)', 0, 0, 5)
         elif rand == 7:
             player_stats[1] -= 1
-            return new_spell('Friendly Mimic', 'Gain a random ability (with +3 luck)', 0, 0, 2)
+            return new_spell('Friendly Mimic', 'Gain a random ability (with +3 luck)', 0, 0, 2)     # Test me
 #  --- Unique Spells --- #
 def spell_nothing():
     print('You do nothing at all')
