@@ -403,10 +403,33 @@ while phase != 'game over':
 
             while turn == 'monster':
                 if monster_slow == 0:
-                    if boss == True and bossphase == 2:
-                        monster_stats[4] += 100
-                        
-                    else:
+                    if boss == True and bossphase == 2: #   Final Boss moves
+                        random_monster_move = random.randint(1, 100)
+                        if 0 < random_monster_move < 51:
+                            attack_damage = monster_stats[2]
+                            player_stats[4] -= int(attack_damage)
+                            print(f'The {monster_stats[5]} attacks for {attack_damage:.0f} damage!')
+                        elif 50 < random_monster_move < 76:
+                            monster_stats[4] += 100
+                            print('The King heals for 100hp!')
+                        elif 75 < random_monster_move < 91:
+                            question = input('Which slot do you care least of? 3 or 4:   ')
+                            time.sleep(0.5)
+                            if question == '3':
+                                spell3 = new_spell('Nothing', 'For you cannot stop me.', 0, 0, 1)
+                                print(f'You have a new spell! {spell3[0]}, {spell3[1]}')
+                            elif question == '4':
+                                spell4 = new_spell('Nothing', 'For you have already lost', 0, 0, 1)
+                                print(f'You have a new spell! {spell4[0]}, {spell4[1]}')
+                            else:
+                                print('Enter either 3 or 4.')
+                        elif 90 < random_monster_move < 100:
+                            print('The King glares at you, for some reason he is giving you time.')
+                        elif random_monster_move == 100:
+                            print('The King stops, suddenly he is gone, You win?.')
+                            phase = 'battle won'
+
+                    else:   #   Regular monster
                         percent_health = monster_stats[4] / monster_stats[3]
                         if percent_health > 0.5:
                             percent_health = 0.5
@@ -431,9 +454,9 @@ while phase != 'game over':
                 if boss == False:
                     phase = 'battle won'
                 elif boss == True and bossphase == 1:
-                    monster_stats = statline('King', player_stats[1], 0, player_stats[2], player_stats[3])
+                    monster_stats = statline('King', player_stats[1], 0, player_stats[2] * 2, player_stats[3] * 3)
                     print('\n!@#$%^%$#@!@#$%$@@#$%#$%$#!@#')
-                    print("You didnt think it would be that easy, did you?")
+                    print("You didn\'t think it would be that easy, did you?")
                     print('!@#$%^%$#@!@#$%$@@#$%#$%$#!@#\n')
                     time.sleep(1)
                     bossphase = 2
