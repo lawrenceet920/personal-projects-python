@@ -6,6 +6,8 @@ import random
 import time
 print('Use "/stats" in combat to see your stats\n')
 
+gold = 100
+
 # --- Character creator --- #
 def statline(name, initiative, luck, power, max_hp):
     '''Creates new statline'''
@@ -20,15 +22,19 @@ while True:
     # Class picker
     if player_class == 1:
         player_class = 'Fighter'
+        print('The noble fighter, a consistant and lasting type.')
         player_stats = statline(input(f'what is your name, {player_class}?\n     '), 100, -1, 75, 250)
         break
     elif player_class == 2:
         player_class = 'Mage'
+        print('The mystical mage, a fragile, but powerful one.')
         player_stats = statline(input(f'what is your name, {player_class}?\n     '), 75, 0, 125, 75)
         break
     elif player_class == 3:
         player_class = 'Rouge'
+        print('The tricky rouge, as unpredictable as they are fast.')
         player_stats = statline(input(f'what is your name, {player_class}?\n     '), 200, 2, 0, 150)
+        gold += 250
         break
     else:
         print('oops try again!\n')
@@ -39,12 +45,13 @@ def statline(name, initiative, luck, power, max_hp):
     '''Creates new statline'''
     return [initiative, luck, power, max_hp, max_hp, name]
 monster_stats = statline('Bat', 50, 0, 10, 25)
-gold = 100
 phase = 'combat'
 player_haste = 0
 monster_slow = 0
 strength = 1
 pickspell = False
+boss = False
+bossphase = 1
 
 # --- Spells --- #
 
@@ -91,7 +98,7 @@ def random_spell():
         elif rand == 5:
             return new_spell('Chaos Bolt', 'Wildly varying damage', 0, 100, 5)
         elif rand == 6:
-            return new_spell('Slow', 'Skip the monsters next turn', 0, 0, 1)    # Test me
+            return new_spell('Slow', 'Skip the monsters next turn', 0, 0, 1)
         elif rand == 7:
             player_stats[1] -= 1
             return new_spell('Teleport', 'Go directly to the shop (gain 500 gold) and then return to the fight', 0, 0, 1)   # Test me
@@ -104,16 +111,16 @@ def random_spell():
             player_stats[1] += 1
             return new_spell('Greatsword', 'Meduim relyable damage', 20, 25, 20)
         elif rand == 3:
-            return new_spell('Warpick', 'Gain gold equil to damage, Meduim damage', 0, 0, 5)    # Test me
+            return new_spell('Warpick', 'Gain gold equil to damage, Meduim damage', 0, 0, 5)
         elif rand == 4:
             return new_spell('Greataxe', 'high damage', 25, 40, 10)
         elif rand == 5:
             return new_spell('Flame Sword', 'HUGE damage', 70, 100, 3)
         elif rand == 6:
-            return new_spell('Potion of Strength', 'Do far more damage for an attack', 0, 0, 1)     # Test me
+            return new_spell('Potion of Strength', 'Do far more damage for an attack', 0, 0, 1)
         elif rand == 7:
             player_stats[1] -= 1
-            return new_spell('Potion of Giant\'s Strength', 'A single use potion use it wisely', 999998, 999999, 1)
+            return new_spell("Potion of Giant's Strength", 'A single use potion use it wisely', 999998, 999999, 1)
         # Rouge
     elif player_class == 'Rouge':
         if rand == 1:
@@ -123,16 +130,16 @@ def random_spell():
             player_stats[1] += 1
             return new_spell('Poisoned Dagger', 'Meduim damage', 15, 25, 20)
         elif rand == 3:
-            return new_spell('Net', 'Slow down your foe for the rest of the encounter', 0, 0, 1)    # Test me
+            return new_spell('Net', 'Slow down your foe for the rest of the encounter', 0, 0, 1)
         elif rand == 4:
             return new_spell('Crystal Dagger', 'high damage', 25, 100, 3)
         elif rand == 5:
-            return new_spell('Potion of grand healing', 'Fully Heal', 0, 0, 1)      # Test me
+            return new_spell('Potion of grand healing', 'Fully Heal', 0, 0, 1)
         elif rand == 6:
             return new_spell('Haste', 'Take 2 additional actions (stacks)', 0, 0, 5)
         elif rand == 7:
             player_stats[1] -= 1
-            return new_spell('Friendly Mimic', 'Gain a random ability (with +3 luck)', 0, 0, 2)     # Test me
+            return new_spell('Friendly Mimic', 'Gain a random ability (with +3 luck)', 0, 0, 2)
 #  --- Unique Spells --- #
 def spell_nothing():
     print('You do nothing at all')
@@ -161,6 +168,8 @@ def spell_strength_potion():
         strength = 2
 
 def spell_warpick():
+    global gold
+
     attack_damage = random.randint(10, 30) 
     attack_damage += attack_damage * (player_stats[2] / 100)
     monster_stats[4] -= int(attack_damage)
@@ -180,10 +189,12 @@ def spell_mimic():
         question = input('Which slot do you want the spell in? 3 or 4:   ')
         time.sleep(0.5)
         if question == '3':
+            global spell3
             spell3 = random_spell()
             print(f'You have a new spell! {spell3[0]}, {spell3[1]}')
             mimic = False
         elif question == '4':
+            global spell4
             spell4 = random_spell()
             print(f'You have a new spell! {spell4[0]}, {spell4[1]}')
             mimic = False
@@ -233,6 +244,9 @@ def levelup(exp):
     player_stats[4] += exp
     player_stats[0] += exp / 2
     print(f'You got {exp * 30} gold')
+    if random.randint(1, 10) == 1:
+        print('Fortune smiles on you')
+        player_stats[1] += 1
     return exp * 30
 
 # --- GAME LOOP --- #
@@ -301,6 +315,8 @@ while phase != 'game over':
                         spell_slow()
                     elif spell3[0] == 'Teleport':
                         spell_teleport()
+                    elif spell3[0] == 'Net':
+                        spell_net()
                     else:
                         attack_damage = random.randint(spell3[2], spell3[3]) 
                         attack_damage += attack_damage * (player_stats[2] / 100)
@@ -333,6 +349,8 @@ while phase != 'game over':
                         spell_slow()
                     elif spell4[0] == 'Teleport':
                         spell_teleport()
+                    elif spell4[0] == 'Net':
+                        spell_net()
                     else:
                         attack_damage = random.randint(spell4[2] + player_stats[1], spell4[3] + player_stats[1]) 
                         attack_damage += attack_damage * (player_stats[0] / 100)
@@ -385,16 +403,20 @@ while phase != 'game over':
 
             while turn == 'monster':
                 if monster_slow == 0:
-                    percent_health = monster_stats[4] / monster_stats[3]
-                    if percent_health > 0.5:
-                        percent_health = 0.5
-                    attack_damage = monster_stats[2] + monster_stats[1]
-                    attack_damage = attack_damage * (percent_health + 0.5)
-                    player_stats[4] -= int(attack_damage)
-                    print(f'The {monster_stats[5]} attacks for {attack_damage:.0f} damage!')
+                    if boss == True and bossphase == 2:
+                        monster_stats[4] += 100
+                        
+                    else:
+                        percent_health = monster_stats[4] / monster_stats[3]
+                        if percent_health > 0.5:
+                            percent_health = 0.5
+                        attack_damage = monster_stats[2] + monster_stats[1]
+                        attack_damage = attack_damage * (percent_health + 0.5)
+                        player_stats[4] -= int(attack_damage)
+                        print(f'The {monster_stats[5]} attacks for {attack_damage:.0f} damage!')
                 else:
                     monster_slow = 0
-                    print('The slow spell ends')
+                    print('The slow spell has ended')
                 print('****************************')
                 turn = 'stage'
         
@@ -406,7 +428,17 @@ while phase != 'game over':
             if player_stats[4] < 1:
                 phase = 'game over'
             elif monster_stats[4] < 1:
-                phase = 'battle won'
+                if boss == False:
+                    phase = 'battle won'
+                elif boss == True and bossphase == 1:
+                    monster_stats = statline('King', player_stats[1], 0, player_stats[2], player_stats[3])
+                    print('\n!@#$%^%$#@!@#$%$@@#$%#$%$#!@#')
+                    print("You didnt think it would be that easy, did you?")
+                    print('!@#$%^%$#@!@#$%$@@#$%#$%$#!@#\n')
+                    time.sleep(1)
+                    bossphase = 2
+                elif boss == True and bossphase == 2:
+                    phase = 'battle won'
 
     # --- End Of combat While statement --- #
                 
@@ -445,12 +477,14 @@ while phase != 'game over':
             monster_intro = 'The final trial before the king'
         elif monster_stats[5] == 'Trent':
             gold += levelup(30)
-            monster_stats = statline('King', player_stats[1], 0, player_stats[2], player_stats[3])
-            monster_intro = 'You finally stand before the king, now strike.'
+            monster_stats = statline('King', 200, 0, 50, 500)
+            monster_intro = 'You finally stand before the king, now strike while you can.'
+            boss = True
         else:
             monster_stats = statline('Reaper', monster_stats[0] * 2, monster_stats[1] * 2, monster_stats[2] * 2, monster_stats[3] * 2)
-            monster_intro = 'You won! now fall.\nDeath attacks for 500 damage!'
-            player_stats[4] -= 500
+            monster_intro = 'You won! now fall.\nDeath attacks for 250 damage!'
+            player_stats[4] -= 250
+            boss = False
         print(f'Up next is a {monster_stats[5]}\n {monster_intro} \n')
         time.sleep(1)
         phase = 'shop'
