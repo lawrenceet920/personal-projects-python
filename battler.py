@@ -45,6 +45,7 @@ def statline(name, initiative, luck, power, max_hp):
     '''Creates new statline'''
     return [initiative, luck, power, max_hp, max_hp, name]
 monster_stats = statline('Bat', 50, 0, 10, 25)
+monster_death = 'The bat screaches as it falls to the ground, wings torn, it is not, dead... but it is now helpless'
 phase = 'combat'
 player_haste = 0
 monster_slow = 0
@@ -426,8 +427,10 @@ while phase != 'game over':
                         elif 90 < random_monster_move < 100:
                             print('The King glares at you, for some reason he is giving you time.')
                         elif random_monster_move == 100:
-                            print('The King stops, suddenly he is gone, You win?.')
-                            phase = 'battle won'
+                            monster_stats = statline('King', player_stats[1], 0, player_stats[2] * 2, player_stats[3] * 3)
+                            print('\n!&!&#%#&^$8@^*(@$%&@($*^$@&*^$^')
+                            print("Even if you win my heir will take the throne, and finish what I have started. You cannot defeat me in a way that matters.")
+                            print('!&!&#%#&^$8@^*(@$%&@($*^$@&*^$^\n')
 
                     else:   #   Regular monster
                         percent_health = monster_stats[4] / monster_stats[3]
@@ -472,41 +475,50 @@ while phase != 'game over':
     # --- BATTLE WON --- #
     while phase == 'battle won':
         print('\n#########################')
+        print(monster_death)
         print('\nYou won the battle!')
         # name, initiative, luck, power, max_hp
         if monster_stats[5] == 'Bat':
             gold += levelup(5)
             monster_stats = statline('Goblin', 75, 0, 10, 70)
             monster_intro = 'The first true battle of an adventure'
+            monster_death = 'The goblin falls over, you think it is a feint... then you are proven otherwise'
         elif monster_stats[5] == 'Goblin':
             gold += levelup(10)
             monster_stats = statline('Troll', 30, 0, 30, 150)
             monster_intro = 'A slow powerful monster'
+            monster_death = 'The ground rumbles as it falls over the path over the moat is now open.'
         elif monster_stats[5] == 'Troll':
             gold += levelup(15)
             monster_stats = statline('Royal Guard', 100, 0, 20, 100)
             monster_intro = 'Into the palice no turning back now'
+            monster_death = ' Their lasts words are: "You treasonous fool! don\'t do it!", you dont bother to remember.'
         elif monster_stats[5] == 'Royal Guard':
             gold += levelup(20)
             monster_stats = statline('PJ', 400, 0, 20, 200)
             monster_intro = 'The first trial to fight the king.'
+            monster_death = 'One final stike stops him from moving, You take a breath how can a human be so fast?'
         elif monster_stats[5] == 'PJ':
             gold += levelup(30)
             monster_stats = statline('Matthew', 25, 0, 100, 250)
             monster_intro = 'The second trial to fight the king.'
+            monster_death = 'He recoils at the last strike, you brace yourself, but the Arch-Mage will not see the next century.'
         elif monster_stats[5] == 'Matthew':
             gold += levelup(30)
             monster_stats = statline('Trent', 100, 0, 20, 500)
             monster_intro = 'The final trial before the king'
+            monster_death = 'He finaly collapses from your onslaught, you question if the body will ever decompose.'
         elif monster_stats[5] == 'Trent':
             gold += levelup(30)
             monster_stats = statline('King', 200, 0, 50, 500)
             monster_intro = 'You finally stand before the king, now strike while you can.'
+            monster_death = 'You have won, it is over, your people are safe from this kingdom, may the rest of you clan have as much luck'
             boss = True
         else:
             monster_stats = statline('Reaper', monster_stats[0] * 2, monster_stats[1] * 2, monster_stats[2] * 2, monster_stats[3] * 2)
-            monster_intro = 'You won! now fall.\nDeath attacks for 250 damage!'
+            monster_intro = '"You won! now fall."\nDeath attacks for 250 damage!'
             player_stats[4] -= 250
+            monster_death = 'The vison fades, you have little time before it comes back.'
             boss = False
         print(f'Up next is a {monster_stats[5]}\n {monster_intro} \n')
         time.sleep(1)
@@ -594,4 +606,5 @@ while phase != 'game over':
             phase = 'combat'
 if phase == 'game over':
     print('You lose!')
+    print(f'Your final stat\'s: {player_class} : {player_stats}')
     phase = 'end'
