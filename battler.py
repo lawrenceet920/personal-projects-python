@@ -16,23 +16,23 @@ while True:
     print('What class are you?')
     print('1: Fighter  (Beginner friendly)')
     print('2: Mage')
-    print('3: Rouge')
-    player_class = int(input("Awaiting Input: "))
+    print('3: Rogue')
+    player_class = input("Awaiting Input: ")
     print()
     # Class picker
-    if player_class == 1:
+    if player_class == '1':
         player_class = 'Fighter'
         print('The noble fighter, a consistant and lasting type.')
         player_stats = statline(input(f'what is your name, {player_class}?\n     '), 100, -1, 75, 250)
         break
-    elif player_class == 2:
+    elif player_class == '2':
         player_class = 'Mage'
         print('The mystical mage, a fragile, but powerful one.')
         player_stats = statline(input(f'what is your name, {player_class}?\n     '), 75, 0, 125, 75)
         break
-    elif player_class == 3:
-        player_class = 'Rouge'
-        print('The tricky rouge, as unpredictable as they are fast.')
+    elif player_class == '3':
+        player_class = 'Rogue'
+        print('The tricky Rogue, as unpredictable as they are fast.')
         player_stats = statline(input(f'what is your name, {player_class}?\n     '), 200, 2, 0, 150)
         gold += 250
         break
@@ -67,7 +67,7 @@ if player_class == 'Mage':
 elif player_class == 'Fighter':
     cantrip = new_spell('Sword', 'Your basic relyable attack, low damage', 6, 13, 100)
     heal = new_spell('Second Wind', 'heal yourself, full healing', 1000, 1001, 1)
-elif player_class == 'Rouge':
+elif player_class == 'Rogue':
     cantrip = new_spell('Dagger', 'Your basic relyable attack, low damage', 5, 10, 100)
     heal = new_spell('Bandages', 'heal yourself, medium healing', 20, 30, 5)
     
@@ -122,8 +122,8 @@ def random_spell():
         elif rand == 7:
             player_stats[1] -= 1
             return new_spell("Potion of Giant's Strength", 'A single use potion use it wisely', 999998, 999999, 1)
-        # Rouge
-    elif player_class == 'Rouge':
+        # Rogue
+    elif player_class == 'Rogue':
         if rand == 1:
             player_stats[1] += 2
             return new_spell('Twin Daggers', 'Low damage', 7, 13, 100)
@@ -201,7 +201,7 @@ def spell_mimic():
             mimic = False
         else:
             print('Enter either 3 or 4.')
-    player_class = 'Rouge'
+    player_class = 'Rogue'
     player_stats[1] -= 3
 
 def spell_grand_heal():
@@ -411,8 +411,8 @@ while phase != 'game over':
                             player_stats[4] -= int(attack_damage)
                             print(f'The {monster_stats[5]} attacks for {attack_damage:.0f} damage!')
                         elif 50 < random_monster_move < 76:
-                            monster_stats[4] += 100
-                            print('The King heals for 100hp!')
+                            monster_stats[4] += 25
+                            print('The King heals for 25hp!')
                         elif 75 < random_monster_move < 91:
                             question = input('Which slot do you care least of? 3 or 4:   ')
                             time.sleep(0.5)
@@ -427,7 +427,7 @@ while phase != 'game over':
                         elif 90 < random_monster_move < 100:
                             print('The King glares at you, for some reason he is giving you time.')
                         elif random_monster_move == 100:
-                            monster_stats = statline('King', player_stats[1], 0, player_stats[2] * 2, player_stats[3] * 3)
+                            monster_stats = statline('King', player_stats[0], 0, player_stats[2] * 3, player_stats[3] * 2)
                             print('\n!&!&#%#&^$8@^*(@$%&@($*^$@&*^$^')
                             print("Even if you win my heir will take the throne, and finish what I have started. You cannot defeat me in a way that matters.")
                             print('!&!&#%#&^$8@^*(@$%&@($*^$@&*^$^\n')
@@ -500,7 +500,7 @@ while phase != 'game over':
             monster_death = 'He suddenly vanishes, he won\'t be in fighting shape until after you have won however!'
         elif monster_stats[5] == 'PJ':
             gold += levelup(30)
-            monster_stats = statline('Matthew', 25, 0, 100, 250)
+            monster_stats = statline('Matthew', 35, 0, 100, 250)
             monster_intro = 'The second trial to fight the king.'
             monster_death = 'He recoils at the last strike, you brace yourself, but the Arch-Mage will not see the next century.'
         elif monster_stats[5] == 'Matthew':
@@ -530,7 +530,7 @@ while phase != 'game over':
             heal = new_spell('Cure Wounds', 'heal yourself, high healing', 30, 70, 3)
         elif player_class == 'Fighter':
             heal = new_spell('Second Wind', 'heal yourself, full healing', 1000, 1001, 1)
-        elif player_class == 'Rouge':
+        elif player_class == 'Rogue':
             heal = new_spell('Bandages', 'heal yourself, medium healing', 20, 30, 5)
         print('\nWelcome to the shop! \nHere is what you can buy\nOr you can buy nothing and leave')
         print(f'you have {gold} gold\n')
