@@ -497,7 +497,7 @@ while phase != 'game over':
             gold += levelup(20)
             monster_stats = statline('PJ', 400, 0, 20, 200)
             monster_intro = 'The first trial to fight the king.'
-            monster_death = 'One final stike stops him from moving, You take a breath how can a human be so fast?'
+            monster_death = 'He suddenly vanishes, he won\'t be in fighting shape until after you have won however!'
         elif monster_stats[5] == 'PJ':
             gold += levelup(30)
             monster_stats = statline('Matthew', 25, 0, 100, 250)
