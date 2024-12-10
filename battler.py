@@ -88,7 +88,7 @@ def random_spell():
     if player_class == 'Mage': # Mage Spells
         if rand == 1:
             player_stats[1] += 2
-            return new_spell('Quarter-staff', 'Low damage', 7, 13, 100)
+            return new_spell('Quarter-staff', 'Consistant, but Low damage', 10, 11, 100)
         elif rand == 2:
             player_stats[1] += 1
             return new_spell('Lightning', 'Meduim damage', 20, 30, 10)
@@ -133,11 +133,11 @@ def random_spell():
         elif rand == 3:
             return new_spell('Net', 'Slow down your foe for the rest of the encounter', 0, 0, 1)
         elif rand == 4:
-            return new_spell('Crystal Dagger', 'high damage', 25, 100, 3)
-        elif rand == 5:
             return new_spell('Potion of grand healing', 'Fully Heal', 0, 0, 1)
-        elif rand == 6:
+        elif rand == 5:
             return new_spell('Haste', 'Take 2 additional actions (stacks)', 0, 0, 5)
+        elif rand == 6:
+            return new_spell('Crystal Dagger', 'high damage', 25, 100, 3)
         elif rand == 7:
             player_stats[1] -= 1
             return new_spell('Friendly Mimic', 'Gain a random ability (with +3 luck)', 0, 0, 2)
@@ -457,14 +457,14 @@ while phase != 'game over':
                 if boss == False:
                     phase = 'battle won'
                 elif boss == True and bossphase == 1:
-                    monster_stats = statline('King', player_stats[1], 0, player_stats[2] * 2, player_stats[3] * 3)
+                    monster_stats = statline('King', player_stats[1] / 2, 0, player_stats[2] + 50, player_stats[3] * 3)
                     print('\n!@#$%^%$#@!@#$%$@@#$%#$%$#!@#')
                     print("You didn\'t think it would be that easy, did you?")
                     print('!@#$%^%$#@!@#$%$@@#$%#$%$#!@#\n')
                     time.sleep(1)
                     bossphase = 2
                 elif boss == True and bossphase == 2:
-                    phase = 'battle won'
+                    phase = 'game won'
 
     # --- End Of combat While statement --- #
                 
@@ -473,7 +473,7 @@ while phase != 'game over':
         strength = 0
         player_stats[2] = player_stats[2] / 2
     # --- BATTLE WON --- #
-    while phase == 'battle won':
+    while phase == 'battle won': # This is only a while to handle errors if this repeats in a row something has gone wrong
         print('\n#########################')
         print(monster_death)
         print('\nYou won the battle!')
@@ -511,27 +511,27 @@ while phase != 'game over':
         elif monster_stats[5] == 'Trent':
             gold += levelup(30)
             monster_stats = statline('King', 200, 0, 50, 500)
-            monster_intro = 'You finally stand before the king, now strike while you can.'
-            monster_death = 'You have won, it is over, your people are safe from this kingdom, may the rest of you clan have as much luck'
+            monster_intro = '!!!   You finally stand before the king, now strike while you can.   !!!'
+            monster_death = 'You have won! It is over, your people are safe from this kingdom, may the rest of you clan have as much luck'
             boss = True
         else:
+            # If no monster can be found this will show to solve the error : Check if there is a typo in what the monster should have been.
             monster_stats = statline('Reaper', monster_stats[0] * 2, monster_stats[1] * 2, monster_stats[2] * 2, monster_stats[3] * 2)
-            monster_intro = '"You won! now fall."\nDeath attacks for 250 damage!'
-            player_stats[4] -= 250
-            monster_death = 'The vison fades, you have little time before it comes back.'
-            boss = False
+            monster_intro = 'Your eyes fog over, you have a feeling something has gone very wrong'
+            monster_death = 'The strange vison fades, you have little time before it comes back.'
         print(f'Up next is a {monster_stats[5]}\n {monster_intro} \n')
         time.sleep(1)
         phase = 'shop'
 
     # --- SHOP --- #
     while phase == 'shop':
-        if player_class == 'Mage':
+        if player_class == 'Mage':  # Restock healing
             heal = new_spell('Cure Wounds', 'heal yourself, high healing', 30, 70, 3)
         elif player_class == 'Fighter':
             heal = new_spell('Second Wind', 'heal yourself, full healing', 1000, 1001, 1)
         elif player_class == 'Rogue':
             heal = new_spell('Bandages', 'heal yourself, medium healing', 20, 30, 5)
+        # Shop startup
         print('\nWelcome to the shop! \nHere is what you can buy\nOr you can buy nothing and leave')
         print(f'you have {gold} gold\n')
         time.sleep(0.5)
@@ -539,9 +539,9 @@ while phase != 'game over':
         # Options
         print('1: Leave store.')
         print(f'2: Full heal: 100gp     Current health:{(player_stats[4]/player_stats[3]*100):.0f}% HP')
-        print(f'3: PJ\'s boots (+ initiative): {(player_stats[0] * 2):.0f}gp')
-        print(f'4: Matthew\'s gloves (+ power): {(player_stats[2] * 4):.0f}gp')
-        print(f'5: Trent\'s Armor (+ max health) {(player_stats[3] * 0.2):.0f}gp')
+        print(f'3: PJ\'s boots (+ %initiative): {(player_stats[0] * 2):.0f}gp')
+        print(f'4: Matthew\'s gloves (+ %power): {(player_stats[2] * 4):.0f}gp')
+        print(f'5: Trent\'s Armor (+ %max health) {(player_stats[3] * 0.2):.0f}gp')
         print('6: Random new spell: 250gp')
         print('7: Upgrade cantrip: 300gp')
 
@@ -592,7 +592,7 @@ while phase != 'game over':
                 cantrip[2] += 1
                 cantrip[3] += 2
 
-        elif buy == '1': # Quit
+        elif buy == '1': # --- Quit --- #
             print('#########################')
             phase = 'combat'
         else:
@@ -608,3 +608,5 @@ if phase == 'game over':
     print('You lose!')
     print(f'Your final stat\'s: {player_class} : {player_stats}')
     phase = 'end'
+elif phase == 'game won':
+    print('You have won, the king is slain and your people are safe, you return to your home a hero.')
