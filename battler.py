@@ -4,55 +4,14 @@
 
 import random
 import time
-print('Use "/stats" in combat to see your stats\n')
-
-gold = 100
 
 # --- Character creator --- #
-def statline(name, initiative, luck, power, max_hp):
-    '''Creates new statline'''
-    return [initiative, luck, power, max_hp, max_hp, name]
-while True:
-    print('What class are you?')
-    print('1: Fighter  (Beginner friendly)')
-    print('2: Mage')
-    print('3: Rogue')
-    player_class = input("Awaiting Input: ")
-    print()
-    # Class picker
-    if player_class == '1':
-        player_class = 'Fighter'
-        print('The noble fighter, a consistant and lasting type.')
-        player_stats = statline(input(f'what is your name, {player_class}?\n     '), 100, -1, 75, 250)
-        break
-    elif player_class == '2':
-        player_class = 'Mage'
-        print('The mystical mage, a fragile, but powerful one.')
-        player_stats = statline(input(f'what is your name, {player_class}?\n     '), 75, 0, 125, 75)
-        break
-    elif player_class == '3':
-        player_class = 'Rogue'
-        print('The tricky Rogue, as unpredictable as they are fast.')
-        player_stats = statline(input(f'what is your name, {player_class}?\n     '), 200, 2, 0, 150)
-        gold += 250
-        break
-    else:
-        print('oops try again!\n')
-        time.sleep(1)
-
 # stat order:   0 initiative, 1 luck, 2 power, 3 max health, 4 current health, 5 name
 def statline(name, initiative, luck, power, max_hp):
     '''Creates new statline'''
     return [initiative, luck, power, max_hp, max_hp, name]
-monster_stats = statline('Bat', 50, 0, 10, 25)
-monster_death = 'The bat screaches as it falls to the ground, wings torn, it is not, dead... but it is now helpless'
-phase = 'combat'
-player_haste = 0
-monster_slow = 0
-strength = 1
-pickspell = False
-boss = False
-bossphase = 1
+
+
 
 # --- Spells --- #
 
@@ -60,21 +19,8 @@ bossphase = 1
 def new_spell(name, description, min_d, max_d, casts):
     '''Creates new basic spell'''
     return [name, description, min_d, max_d, casts, casts]
-# Starter spells
-if player_class == 'Mage':
-    cantrip = new_spell('Firebolt', 'Your basic relyable attack, low damage', 5, 10, 100)
-    heal = new_spell('Cure Wounds', 'heal yourself, high healing', 30, 70, 3)
-elif player_class == 'Fighter':
-    cantrip = new_spell('Sword', 'Your basic relyable attack, low damage', 6, 13, 100)
-    heal = new_spell('Second Wind', 'heal yourself, full healing', 1000, 1001, 1)
-elif player_class == 'Rogue':
-    cantrip = new_spell('Dagger', 'Your basic relyable attack, low damage', 5, 10, 100)
-    heal = new_spell('Bandages', 'heal yourself, medium healing', 20, 30, 5)
-    
-spell3 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
-spell4 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
-
 def random_spell():
+    '''Picks a random spell from the spell list'''
     SPELL_COUNT = 7
     rand = random.randint(1, SPELL_COUNT)
     global player_class
@@ -84,7 +30,8 @@ def random_spell():
         rand = SPELL_COUNT
     elif rand < 1:
         rand = 1
-    # pick spell from list based on roll + luck
+    
+        # Spell table
     if player_class == 'Mage': # Mage Spells
         if rand == 1:
             player_stats[1] += 2
@@ -141,36 +88,41 @@ def random_spell():
         elif rand == 7:
             player_stats[1] -= 1
             return new_spell('Friendly Mimic', 'Gain a random ability (with +3 luck)', 0, 0, 2)
-#  --- Unique Spells --- #
-def spell_nothing():
-    print('You do nothing at all')
 
+
+
+#  --- Unique Spells --- #
+        
+def spell_nothing():
+    '''Blank Spell slot'''
+    print('You do nothing at all')
 def spell_drain_life():
+    '''Heal player - damage foe'''
     attack_damage = random.randint(20, 30) 
     attack_damage += attack_damage * (player_stats[2] / 100)
     monster_stats[4] -= int(attack_damage)
     player_stats[4] += 10
     print(f'You did {attack_damage} damage to the monster, and healed yourself by 10!')
-
 def spell_haste():
+    '''Player takes 2 additional actions'''
     global player_haste
     player_haste += 3
 def spell_slow():
+    '''Monster loses next turn'''
     global monster_slow
     monster_slow += 1
-
 def spell_net():
+    '''Monster loses half speed'''
     monster_stats[0] = monster_stats[0] / 2
-
 def spell_strength_potion():
+    '''Player gains double power for 1 action *number is 2 for ending turn after cast'''
     global strength
     if strength == 0:
         player_stats[2] += player_stats[2]
         strength = 2
-
 def spell_warpick():
+    '''Attack that gives gold'''
     global gold
-
     attack_damage = random.randint(10, 30) 
     attack_damage += attack_damage * (player_stats[2] / 100)
     monster_stats[4] -= int(attack_damage)
@@ -178,6 +130,7 @@ def spell_warpick():
     print(f'You did {attack_damage} damage to the monster, and gained that much gold')
 
 def spell_mimic():
+    '''Pick a random class and gain a spell with +3 luck from it'''
     mimic = random.randint(1, 3)
     global player_class
     if mimic == 1:
@@ -205,10 +158,11 @@ def spell_mimic():
     player_stats[1] -= 3
 
 def spell_grand_heal():
+    '''Heal to full'''
     player_stats[4] = player_stats[3]
     print('Your health is now maxxed!\n')
-
 def spell_teleport():
+    '''Go to shop and gain 500 gold'''
     global phase
     global gold
     phase = 'shop'
@@ -250,9 +204,81 @@ def levelup(exp):
         player_stats[1] += 1
     return exp * 30
 
-# --- GAME LOOP --- #
 
+# --- Variables --- #
+
+gold = 100
+monster_stats = statline('Bat', 50, 0, 10, 25) # First monster VVV
+monster_death = 'The bat screaches as it falls to the ground, wings torn, it is not, dead... but it is now helpless'
+phase = 'combat'
 turn = 'stage'
+boss = False
+bossphase = 1
+# Blank spells
+spell4 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
+# Unique spell variables
+player_haste = 0
+monster_slow = 0
+strength = 1
+
+# --- Start of game --- #
+
+time.sleep(0.5)
+print('\n\nUse "/stats" in combat to see your health')
+time.sleep(0.2)
+print('All multiple choice prompts, should be answered with a number\n')
+time.sleep(2)
+print('Your goal is to defeat the king.')
+time.sleep(1)
+print('\n\n\n')
+
+while True:
+    print('What class are you?')
+    print('1: Fighter  (Beginner friendly)')
+    print('2: Mage')
+    print('3: Rogue')
+    player_class = input("Awaiting Input: ")
+    print()
+    # Class picker
+    if player_class == '1':
+        player_class = 'Fighter'
+        print('The noble fighter, a consistant and lasting type.') # Flavour text
+        player_stats = statline(input(f'what is your name, {player_class}?\n     '), 100, -1, 75, 250)
+        spell3 = new_spell('Handaxe', 'These things are heavy, best be rid of em sooner or later anyway', 10, 15, 2)
+        cantrip = new_spell('Sword', 'Your basic relyable attack, low damage', 6, 13, 100)
+        heal = new_spell('Second Wind', 'heal yourself, full healing', 1000, 1001, 1)
+        break
+    elif player_class == '2':
+        player_class = 'Mage'
+        print('The mystical mage, a fragile, but powerful one.') # Flavour text
+        player_stats = statline(input(f'what is your name, {player_class}?\n     '), 75, 0, 125, 75)
+        spell3 = new_spell('Spell Scroll', 'An old relic, but will do the job, shame though...', 30, 50, 1)
+        cantrip = new_spell('Firebolt', 'Your basic relyable attack, low damage', 5, 10, 100)
+        heal = new_spell('Cure Wounds', 'heal yourself, high healing', 30, 70, 3)
+        break
+    elif player_class == '3':
+        player_class = 'Rogue'
+        print('The tricky Rogue, as unpredictable as they are fast.') # Flavour text
+        player_stats = statline(input(f'what is your name, {player_class}?\n     '), 200, 2, 0, 150)
+        spell3 = new_spell('Acid Vial', 'Packs a punch, (and was all you could get before you left home)', 20, 30, 1)
+        spell4 = new_spell('Twin Daggers', 'Better then 1', 7, 13, 100)
+        cantrip = new_spell('Dagger', 'Your basic relyable attack, low damage', 5, 10, 100)
+        heal = new_spell('Bandages', 'heal yourself, medium healing', 20, 30, 5)
+        break
+    elif player_class == '4':
+        player_class = 'Artificer'
+        print('The crafty Artificer, magic and unpredictability what a combo') # Flavour text
+        player_stats = statline(input(f'what is your name, {player_class}?\n     '), 100, 0, 50, 100)
+        spell3 = new_spell('Junk', 'Just toss it at em, it\'s already used anyways', 10, 50, 1)
+        cantrip = new_spell('Odd Contraption', 'Your basic relyable attack, low damage', 0, 0, 100)
+        heal = new_spell('Healers Kit', 'heal yourself, medium healing', 20, 25, 3)
+        break
+    else:
+        print('oops try again!\n')
+        time.sleep(1)
+
+
+# --- GAME LOOP --- #
 time.sleep(0.5)
 
 while phase != 'game over':
@@ -533,7 +559,7 @@ while phase != 'game over':
             heal = new_spell('Bandages', 'heal yourself, medium healing', 20, 30, 5)
         # Shop startup
         print('\nWelcome to the shop! \nHere is what you can buy\nOr you can buy nothing and leave')
-        print(f'you have {gold} gold\n')
+        print(f'you have {gold:.0f} gold\n')
         time.sleep(0.5)
 
         # Options
@@ -542,8 +568,8 @@ while phase != 'game over':
         print(f'3: PJ\'s boots (+ %initiative): {(player_stats[0] * 2):.0f}gp')
         print(f'4: Matthew\'s gloves (+ %power): {(player_stats[2] * 4):.0f}gp')
         print(f'5: Trent\'s Armor (+ %max health) {(player_stats[3] * 0.2):.0f}gp')
-        print('6: Random new spell: 250gp')
-        print('7: Upgrade cantrip: 300gp')
+        print('6: Gain new spell (slot 3/4): 250gp')
+        print('7: Upgrade cantrip (slot 1): 300gp')
 
         # Player Input (BUY STUFF) --- #
         buy = input('\n ')
@@ -552,24 +578,36 @@ while phase != 'game over':
                 gold -= 100
                 player_stats[4] = player_stats[3]
                 print('Your health is now maxxed!\n')
+            else:
+                print('You do not have enough gold for that.')
+                time.sleep(0.5)
 
         elif buy == '3': # Speed
             if gold > player_stats[0] - 1:
                 gold -= player_stats[0] * 2
                 player_stats[0] += int(player_stats[0]) / 10
                 print(f'Your initiative is now {player_stats[0]}.\n')
+            else:
+                print('You do not have enough gold for that.')
+                time.sleep(0.5)
 
         elif buy == '4': # Power
             if gold > (player_stats[2] * 4) - 1:
                 gold -= player_stats[2] * 4
                 player_stats[2] += int(player_stats[2]) / 10
                 print(f'Your power is now {player_stats[2]}.\n')
+            else:
+                print('You do not have enough gold for that.')
+                time.sleep(0.5)
 
         elif buy == '5': # Max Health
             if gold > (player_stats[3] * 0.2) - 1:
                 gold -= player_stats[3] * 0.2
                 player_stats[3] += int(player_stats[3] / 10)
                 print(f'Your max health is now {player_stats[3]}.\n')
+            else:
+                print('You do not have enough gold for that.')
+                time.sleep(0.5)
 
         elif buy == '6': # New Spell
             if gold > 249:
@@ -585,12 +623,18 @@ while phase != 'game over':
                 else:
                     print('Enter either 3 or 4.')
                 time.sleep(1)
+            else:
+                print('You do not have enough gold for that.')
+                time.sleep(0.5)
 
         elif buy == '7': # Upgrade cantrip
             if gold > 299:
                 gold -= 300
                 cantrip[2] += 1
                 cantrip[3] += 2
+            else:
+                print('You do not have enough gold for that.')
+                time.sleep(0.5)
 
         elif buy == '1': # --- Quit --- #
             print('#########################')
