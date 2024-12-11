@@ -196,7 +196,7 @@ def odd_contraption():
     
 def options():
     print(f'1: {cantrip[0]} : {cantrip[1]}')
-    print(f'2: {heal[0]} : {heal[1]} : {heal[5]} casts left (restocks automaticly on shop)')
+    print(f'2: {heal[0]} : {heal[1]} : {heal[5]} casts left')
     print(f'3: {spell3[0]} : {spell3[1]} : {spell3[5]} casts left')
     print(f'4: {spell4[0]} : {spell4[1]} : {spell4[5]} casts left')
 # End turn
@@ -227,7 +227,52 @@ def levelup(exp):
         print('Fortune smiles on you')
         player_stats[1] += 1
     return exp * 30
-
+# Tutorial
+def play_tutorial(entry):
+    global player_class
+    print()
+    if entry == 0:
+        print('On your turn you pick 1 of 4 "spells" they will do a varity of things.')
+        time.sleep(1)
+        print('Your goal is to reduce your foe\'s health to 0.')
+        time.sleep(1)
+        print('Your first spell is always a infinite use low damage attack, a "Cantrip"!')
+        time.sleep(1)
+        print(f'This turn type "1" to use your {cantrip[0]} on the {monster_stats[5]}')
+    elif entry == 1:
+        print('On the monster\'s turn they will attack you!')
+        time.sleep(1)
+        print('If they reduce your health to 0 you lose the game!')
+        time.sleep(1)
+        print('On your turn do "/stats" to see how much health you have left.')
+        time.sleep(1)
+        print('If you are too low on hp, your second spell slot will heal you.')
+        time.sleep(1)
+        print('It will also restock automaticly after combat in the "Store".')
+    elif entry == 2:
+        print('After winning a combat you level up!')
+        time.sleep(1)
+        print('This will give you flat stat bonuses based on the monsters difficulty')
+    elif entry == 3:
+        print('You are now in the store!')
+        time.sleep(1)
+        print('any stat increse is persentage based in both cost and effectiveness, so it may not be a great idea to buy any until you have higher stats from levelups.')
+        time.sleep(1)
+        print('The most powerful purchaces are healing to full, or buying a new spell')
+        time.sleep(1)
+        print('however both are only short term upgrades, for now I would reccomend getting a new spell.')
+    elif entry == 4:
+        print('You just bought a new spell! there are 7 different you can get.')
+        time.sleep(1)
+        print(f'you only have 2 slots to hold it, but it is likly it is far more powerful then your {cantrip[0]}')
+        time.sleep(1)
+        if player_class == 'Mage':
+            print('They are also unique to your class, so you will have entirely different abilitys compared to say a Rogue!')
+        else:
+            print('They are also unique to your class, so you will have entirely different abilitys compared to say a Mage!')
+    time.sleep(3)
+    tutorial[entry] = False
+    print()
 
 # --- Variables --- #
 
@@ -244,6 +289,7 @@ spell4 = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
 player_haste = 0
 monster_slow = 0
 strength = 1
+
 
 # --- Start of game --- #
 
@@ -293,6 +339,16 @@ while True:
         print('oops try again!\n')
         time.sleep(1)
 
+print('Do you want game tips?')
+print('1: Yes, enable full tutorial')
+print('2: No, disable all')
+tutorial = input()
+if tutorial == '2':
+    tutorial = [False, False, False, False, False]
+else:
+    tutorial = [True, True, True, True, True]
+
+
 
 # --- GAME LOOP --- #
 time.sleep(0.5)
@@ -309,6 +365,8 @@ while phase != 'game over':
             turn = 'player'
             # Give information
             print(f'    it is {player_stats[5]}\'s turn.')
+            if tutorial[0]:
+                play_tutorial(0)
             time.sleep(0.5)
             while turn == 'player':
                 options()
@@ -333,7 +391,7 @@ while phase != 'game over':
                             player_stats[4] = player_stats[3]
                     heal[5] -= 1
                     if heal[5] == 0:
-                        print(f'You Ran out of casts for {heal[0]} (They will restock when you enter the shop)')
+                        print(f'You Ran out of casts for {heal[0]}')
                         heal = new_spell('Nothing', 'Do nothing at all', 0, 0, 1)
                     turn_end()
 
@@ -442,6 +500,8 @@ while phase != 'game over':
             turn = 'monster'
             print(f'    it is the {monster_stats[5]}\'s turn.')
             time.sleep(0.5)
+            if tutorial[1]:
+                play_tutorial(1)
 
             while turn == 'monster':
                 if monster_slow == 0:
@@ -518,6 +578,8 @@ while phase != 'game over':
         print('\n#########################')
         print(monster_death)
         print('\nYou won the battle!')
+        if tutorial[2]:
+            play_tutorial(2)
         # name, initiative, luck, power, max_hp
         if monster_stats[5] == 'Bat':
             gold += levelup(5)
@@ -576,13 +638,15 @@ while phase != 'game over':
         print('\nWelcome to the shop! \nHere is what you can buy\nOr you can buy nothing and leave')
         print(f'you have {gold:.0f} gold\n')
         time.sleep(0.5)
+        if tutorial[3]:
+            play_tutorial(3)
 
         # Options
         print('1: Leave store.')
         print(f'2: Full heal: 100gp     Current health:{(player_stats[4]/player_stats[3]*100):.0f}% HP')
-        print(f'3: PJ\'s boots (+ %initiative): {(player_stats[0] * 2):.0f}gp')
-        print(f'4: Matthew\'s gloves (+ %power): {(player_stats[2] * 4):.0f}gp')
-        print(f'5: Trent\'s Armor (+ %max health) {(player_stats[3] * 0.2):.0f}gp')
+        print(f'3: PJ\'s boots (initiative): {(player_stats[0] * 2):.0f}gp')
+        print(f'4: Matthew\'s gloves (power): {(player_stats[2] * 4):.0f}gp')
+        print(f'5: Trent\'s Armor (max health) {(player_stats[3] * 0.2):.0f}gp')
         print('6: Gain new spell (slot 3/4): 250gp')
         print('7: Upgrade cantrip (slot 1): 300gp')
 
@@ -626,6 +690,8 @@ while phase != 'game over':
 
         elif buy == '6': # New Spell
             if gold > 249:
+                if tutorial[4]:
+                    play_tutorial(4)
                 gold -= 250
                 question = input('Which slot do you want the spell in? 3 or 4:   ')
                 time.sleep(0.5)
