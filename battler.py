@@ -80,25 +80,6 @@ def random_spell():
         elif rand == 3:
             return new_spell('Net', 'Slow down your foe for the rest of the encounter', 0, 0, 1)
         elif rand == 4:
-            return new_spell('Bottled Lightning', 'Fully Heal', 0, 0, 1)
-        elif rand == 5:
-            return new_spell('Haste', 'Take 2 additional actions (stacks)', 0, 0, 5)
-        elif rand == 6:
-            return new_spell('Crystal Dagger', 'high damage', 25, 100, 3)
-        elif rand == 7:
-            player_stats[1] -= 1
-            return new_spell('Friendly Mimic', 'Gain a random ability (with +3 luck)', 0, 0, 2)
-        # Artificer
-    elif player_class == 'Artificer':
-        if rand == 1:
-            player_stats[1] += 2
-            return new_spell('Twin Daggers', 'Low damage', 7, 13, 100)
-        elif rand == 2:
-            player_stats[1] += 1
-            return new_spell('Poisoned Dagger', 'Meduim damage', 15, 25, 20)
-        elif rand == 3:
-            return new_spell('Net', 'Slow down your foe for the rest of the encounter', 0, 0, 1)
-        elif rand == 4:
             return new_spell('Potion of grand healing', 'Fully Heal', 0, 0, 1)
         elif rand == 5:
             return new_spell('Haste', 'Take 2 additional actions (stacks)', 0, 0, 5)
@@ -107,8 +88,6 @@ def random_spell():
         elif rand == 7:
             player_stats[1] -= 1
             return new_spell('Friendly Mimic', 'Gain a random ability (with +3 luck)', 0, 0, 2)
-
-
 
 #  --- Unique Spells --- #
         
@@ -310,14 +289,6 @@ while True:
         cantrip = new_spell('Dagger', 'Your basic relyable attack, low damage', 5, 10, 100)
         heal = new_spell('Bandages', 'heal yourself, medium healing', 20, 30, 5)
         break
-    elif player_class == '4':
-        player_class = 'Artificer'
-        print('The crafty Artificer, magic and unpredictability what a combo') # Flavour text
-        player_stats = statline(input(f'what is your name, {player_class}?\n     '), 100, 0, 50, 100)
-        spell3 = new_spell('Junk', 'Just toss it at em, it\'s already used anyways', 10, 50, 1)
-        cantrip = new_spell('Odd Contraption', 'Your basic relyable attack, low damage', 5, 10, 100)
-        heal = new_spell('Health Potion', 'heal yourself, medium healing', 20, 25, 3)
-        break
     else:
         print('oops try again!\n')
         time.sleep(1)
@@ -344,15 +315,11 @@ while phase != 'game over':
                 player_action = input('What do you do?:     ')
                 # Player Actions
                 if player_action == '1':
-                    if cantrip [0] == 'Odd Contraption':
-                        odd_contraption()
-                    else:
-                        attack_damage = random.randint(cantrip[2], cantrip[3]) 
-                        attack_damage += attack_damage * (player_stats[2] / 100)
-                        monster_stats[4] -= int(attack_damage)
-                        print(f'You did {attack_damage:.0f} damage to the monster!')
-                        turn_end()
-
+                    attack_damage = random.randint(cantrip[2], cantrip[3]) 
+                    attack_damage += attack_damage * (player_stats[2] / 100)
+                    monster_stats[4] -= int(attack_damage)
+                    print(f'You did {attack_damage:.0f} damage to the monster!')
+                    turn_end()
                 elif player_action == '2':
                     if heal[0] == 'Nothing':
                         spell_nothing()
