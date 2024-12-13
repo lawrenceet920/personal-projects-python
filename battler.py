@@ -317,7 +317,7 @@ while True:
         spell3 = new_spell('Handaxe', 'These things are heavy, best be rid of em sooner or later anyway', 10, 15, 2)
         cantrip = new_spell('Sword', 'Your basic relyable attack, low damage', 6, 13, 100)
         heal = new_spell('Second Wind', 'heal yourself, full healing', 1000, 1001, 1)
-        survival = 0 # survival is here for potential debuffs
+        survival = 0
         break
     elif player_class == '2':
         player_class = 'Mage'
@@ -743,7 +743,7 @@ while phase != 'game over':
             phase = 'combat'
 if phase == 'game over':
     print('You lose!')
-    print(f'Your final stat\'s: {player_class} : {player_stats}')
+    # print(f'Your final stat\'s: {player_class} : {player_stats} : {gold}')
     phase = 'end'
 elif phase == 'game won':
     print('You have won, the king is slain and your people are safe, you return to your home a hero.')
