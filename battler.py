@@ -317,6 +317,7 @@ while True:
         spell3 = new_spell('Handaxe', 'These things are heavy, best be rid of em sooner or later anyway', 10, 15, 2)
         cantrip = new_spell('Sword', 'Your basic relyable attack, low damage', 6, 13, 100)
         heal = new_spell('Second Wind', 'heal yourself, full healing', 1000, 1001, 1)
+        survival = 0 # survival is here for potential debuffs
         break
     elif player_class == '2':
         player_class = 'Mage'
@@ -325,6 +326,7 @@ while True:
         spell3 = new_spell('Spell Scroll', 'An old relic, but will do the job, shame though...', 30, 50, 1)
         cantrip = new_spell('Firebolt', 'Your basic relyable attack, low damage', 5, 10, 100)
         heal = new_spell('Cure Wounds', 'heal yourself, high healing', 30, 70, 3)
+        survival = 1
         break
     elif player_class == '3':
         player_class = 'Rogue'
@@ -334,6 +336,7 @@ while True:
         spell4 = new_spell('Twin Daggers', 'Better then 1', 7, 13, 100)
         cantrip = new_spell('Dagger', 'Your basic relyable attack, low damage', 5, 10, 100)
         heal = new_spell('Bandages', 'heal yourself, medium healing', 20, 30, 5)
+        survival = 1
         break
     else:
         print('oops try again!\n')
@@ -505,43 +508,52 @@ while phase != 'game over':
 
             while turn == 'monster':
                 if monster_slow == 0:
-                    if boss == True and bossphase == 2: #   Final Boss moves
-                        random_monster_move = random.randint(1, 100)
-                        if 0 < random_monster_move < 51:
-                            attack_damage = monster_stats[2]
-                            player_stats[4] -= int(attack_damage)
-                            print(f'The {monster_stats[5]} attacks for {attack_damage:.0f} damage!')
-                        elif 50 < random_monster_move < 76:
-                            monster_stats[4] += 25
-                            print('The King heals for 25hp!')
-                        elif 75 < random_monster_move < 91:
-                            question = input('Which slot do you care least of? 3 or 4:   ')
-                            time.sleep(0.5)
-                            if question == '3':
-                                spell3 = new_spell('Nothing', 'For you cannot stop me.', 0, 0, 1)
-                                print(f'You have a new spell! {spell3[0]}, {spell3[1]}')
-                            elif question == '4':
-                                spell4 = new_spell('Nothing', 'For you have already lost', 0, 0, 1)
-                                print(f'You have a new spell! {spell4[0]}, {spell4[1]}')
-                            else:
-                                print('Enter either 3 or 4.')
-                        elif 90 < random_monster_move < 100:
-                            print('The King glares at you, for some reason he is giving you time.')
-                        elif random_monster_move == 100:
-                            monster_stats = statline('King', player_stats[0], 0, player_stats[2] * 3, player_stats[3] * 2)
-                            print('\n!&!&#%#&^$8@^*(@$%&@($*^$@&*^$^')
-                            print("Even if you win my heir will take the throne, and finish what I have started. You cannot defeat me in a way that matters.")
-                            print('!&!&#%#&^$8@^*(@$%&@($*^$@&*^$^\n')
-
-                    else:   #   Regular monster
-                        percent_health = monster_stats[4] / monster_stats[3]
-                        if percent_health > 0.5:
-                            percent_health = 0.5
-                        attack_damage = monster_stats[2] + monster_stats[1]
-                        attack_damage = attack_damage * (percent_health + 0.5)
+                    # Determine damge (here for survival mechanic)
+                    percent_health = monster_stats[4] / monster_stats[3]
+                    if percent_health > 0.5:
+                        percent_health = 0.5
+                    attack_damage = monster_stats[2] + monster_stats[1]
+                    attack_damage = attack_damage * (percent_health + 0.5)
+                    if attack_damage > player_stats[4] and survival > 0: 
+                        # If the monster would kill the player set their health to 1 instead
+                        survival -= 1
+                        attack_damage = attack_damage / 2
                         player_stats[4] -= int(attack_damage)
                         print(f'The {monster_stats[5]} attacks for {attack_damage:.0f} damage!')
-                else:
+                    else:
+                        if boss == True and bossphase == 2: #   Final Boss moves
+                            random_monster_move = random.randint(1, 100)
+                            if 0 < random_monster_move < 51:
+                                player_stats[4] -= int(attack_damage)
+                                print(f'The {monster_stats[5]} attacks for {attack_damage:.0f} damage!')
+                            elif 50 < random_monster_move < 76:
+                                monster_stats[4] += 25
+                                print('The King heals for 25hp!')
+                            elif 75 < random_monster_move < 91:
+                                question = input('Which slot do you care least of? 3 or 4:   ')
+                                time.sleep(0.5)
+                                if question == '3':
+                                    spell3 = new_spell('Nothing', 'For you cannot stop me.', 0, 0, 1)
+                                    print(f'You have a new spell! {spell3[0]}, {spell3[1]}')
+                                elif question == '4':
+                                    spell4 = new_spell('Nothing', 'For you have already lost', 0, 0, 1)
+                                    print(f'You have a new spell! {spell4[0]}, {spell4[1]}')
+                                else:
+                                    print('Enter either 3 or 4.')
+                            elif 90 < random_monster_move < 100:
+                                print('The King glares at you, for some reason he is giving you time.')
+                            elif random_monster_move == 100:
+                                monster_stats = statline('King', player_stats[0], 0, player_stats[2] * 3, player_stats[3] * 2)
+                                print('\n!&!&#%#&^$8@^*(@$%&@($*^$@&*^$^')
+                                print("Even if you win my heir will take the throne, and finish what I have started. You cannot defeat me in a way that matters.")
+                                print('!&!&#%#&^$8@^*(@$%&@($*^$@&*^$^\n')
+
+                        else:   #   Regular monster
+                            # Attack damage is determined on turn start
+                            player_stats[4] -= int(attack_damage)
+                            print(f'The {monster_stats[5]} attacks for {attack_damage:.0f} damage!')
+                        # End of survival mechanic
+                else: # Slow
                     monster_slow = 0
                     print('The slow spell has ended')
                 print('****************************')
