@@ -452,8 +452,8 @@ while phase != 'game over':
                     elif spell4[0] == 'Net':
                         spell_net()
                     else:
-                        attack_damage = random.randint(spell4[2] + player_stats[1], spell4[3] + player_stats[1]) 
-                        attack_damage += attack_damage * (player_stats[0] / 100)
+                        attack_damage = random.randint(spell4[2], spell4[3]) 
+                        attack_damage += attack_damage * (player_stats[2] / 100)
                         monster_stats[4] -= int(attack_damage)
                         print(f'You did {attack_damage:.0f} damage to the monster!')
 
@@ -558,7 +558,7 @@ while phase != 'game over':
                 if boss == False:
                     phase = 'battle won'
                 elif boss == True and bossphase == 1:
-                    monster_stats = statline('King', player_stats[1] / 2, 0, player_stats[2] + 50, player_stats[3] * 3)
+                    monster_stats = statline('King', player_stats[1] / 2, 0, player_stats[2] + 50, 1000)
                     print('\n!@#$%^%$#@!@#$%$@@#$%#$%$#!@#')
                     print("You didn\'t think it would be that easy, did you?")
                     print('!@#$%^%$#@!@#$%$@@#$%#$%$#!@#\n')
@@ -593,27 +593,27 @@ while phase != 'game over':
             monster_death = 'The ground rumbles as it falls over the path over the moat is now open.'
         elif monster_stats[5] == 'Troll':
             gold += levelup(15)
-            monster_stats = statline('Royal Guard', 100, 0, 20, 100)
+            monster_stats = statline('Royal Guard', 100, 0, 20, 200)
             monster_intro = 'Into the palice no turning back now'
             monster_death = ' Their lasts words are: "You treasonous fool! don\'t do it!", you dont bother to remember.'
         elif monster_stats[5] == 'Royal Guard':
             gold += levelup(20)
-            monster_stats = statline('PJ', 400, 0, 20, 200)
+            monster_stats = statline('PJ', 400, 0, 20, 300)
             monster_intro = 'The first trial to fight the king.'
             monster_death = 'He suddenly vanishes, he won\'t be in fighting shape until after you have won however!'
         elif monster_stats[5] == 'PJ':
             gold += levelup(30)
-            monster_stats = statline('Matthew', 35, 0, 100, 250)
+            monster_stats = statline('Matthew', 35, 0, 100, 300)
             monster_intro = 'The second trial to fight the king.'
             monster_death = 'He recoils at the last strike, you brace yourself, but the Arch-Mage will not see the next century.'
         elif monster_stats[5] == 'Matthew':
             gold += levelup(30)
-            monster_stats = statline('Trent', 100, 0, 20, 500)
+            monster_stats = statline('Trent', 100, 0, 20, 600)
             monster_intro = 'The final trial before the king'
             monster_death = 'He finaly collapses from your onslaught, you question if the body will ever decompose.'
         elif monster_stats[5] == 'Trent':
             gold += levelup(30)
-            monster_stats = statline('King', 200, 0, 50, 500)
+            monster_stats = statline('King', 100, 0, 50, 500)
             monster_intro = '!!!   You finally stand before the king, now strike while you can.   !!!'
             monster_death = 'You have won! It is over, your people are safe from this kingdom, may the rest of you clan have as much luck'
             boss = True
